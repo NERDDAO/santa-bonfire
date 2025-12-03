@@ -1,0 +1,498 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --font-serif: var(--font-lora), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --shadow-center: 0 0 12px -2px rgb(0 0 0 / 0.05);
+  --animate-pulse-fast: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  /* Christmas Colors */
+  --color-christmas-red: #c41e3a;
+  --color-christmas-green: #228b22;
+  --color-christmas-gold: #ffd700;
+  --color-christmas-snow: #fffafa;
+}
+
+@plugin "daisyui" {
+  themes:
+    light,
+    dark --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+
+  --color-primary: #c41e3a;
+  --color-primary-content: #ffffff;
+  --color-secondary: #228b22;
+  --color-secondary-content: #ffffff;
+  --color-accent: #ffd700;
+  --color-accent-content: #1a1a1a;
+  --color-neutral: #212638;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #fffafa;
+  --color-base-200: #f5f0f0;
+  --color-base-300: #e8e0e0;
+  --color-base-content: #212638;
+  --color-info: #3b82f6;
+  --color-success: #228b22;
+  --color-warning: #ffd700;
+  --color-error: #c41e3a;
+
+  --radius-field: 9999rem;
+  --radius-box: 1rem;
+  --tt-tailw: 6px;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+
+  --color-primary: #ff6b6b;
+  --color-primary-content: #1a1a1a;
+  --color-secondary: #4ade80;
+  --color-secondary-content: #1a1a1a;
+  --color-accent: #ffd700;
+  --color-accent-content: #1a1a1a;
+  --color-neutral: #f9fbff;
+  --color-neutral-content: #1a3a2a;
+  --color-base-100: #1a2a1a;
+  --color-base-200: #152015;
+  --color-base-300: #0f170f;
+  --color-base-content: #f9fbff;
+  --color-info: #60a5fa;
+  --color-success: #4ade80;
+  --color-warning: #ffd700;
+  --color-error: #ff6b6b;
+
+  --radius-field: 9999rem;
+  --radius-box: 1rem;
+
+  --tt-tailw: 6px;
+  --tt-bg: var(--color-primary);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  :root {
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: rgba(26, 26, 26, 0.6);
+    --color-border-subtle: rgba(26, 26, 26, 0.1);
+    --color-shadow-soft: rgba(0, 0, 0, 0.05);
+    --color-christmas-red: #c41e3a;
+    --color-christmas-green: #228b22;
+    --color-christmas-gold: #ffd700;
+  }
+
+  [data-theme="dark"] {
+    --color-text-primary: #f9fbff;
+    --color-text-secondary: rgba(249, 251, 255, 0.6);
+    --color-border-subtle: rgba(249, 251, 255, 0.1);
+    --color-shadow-soft: rgba(0, 0, 0, 0.2);
+    --color-christmas-red: #ff6b6b;
+    --color-christmas-green: #4ade80;
+    --color-christmas-gold: #ffd700;
+  }
+
+  body {
+    min-height: 100vh;
+    font-family: var(--font-inter), sans-serif;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-lora), serif;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+  }
+
+  h1, h2 {
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h3, h4 {
+    line-height: 1.3;
+  }
+
+  h5, h6 {
+    line-height: 1.4;
+  }
+
+  p {
+    margin: 1.25rem 0;
+  }
+
+  /* Smooth scroll behavior for anchor navigation */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+:root,
+[data-theme] {
+  background: var(--color-base-200);
+}
+
+/* Christmas Banner backdrop with subtle snowflake pattern */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-image: url('/banner.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+[data-theme="dark"] body::before {
+  opacity: 0.12;
+}
+
+/* Christmas-themed utility classes */
+.text-christmas-red {
+  color: var(--color-christmas-red);
+}
+
+.text-christmas-green {
+  color: var(--color-christmas-green);
+}
+
+.text-christmas-gold {
+  color: var(--color-christmas-gold);
+}
+
+.bg-christmas-red {
+  background-color: var(--color-christmas-red);
+}
+
+.bg-christmas-green {
+  background-color: var(--color-christmas-green);
+}
+
+.bg-christmas-gold {
+  background-color: var(--color-christmas-gold);
+}
+
+.christmas-card-border {
+  border: 2px solid var(--color-christmas-red);
+  border-radius: 1rem;
+}
+
+.christmas-card-bg {
+  background: linear-gradient(135deg, rgba(196, 30, 58, 0.05) 0%, rgba(34, 139, 34, 0.05) 100%);
+}
+
+.christmas-card-hover:hover {
+  box-shadow: 0 4px 20px rgba(196, 30, 58, 0.15);
+}
+
+.christmas-modal {
+  border: 2px solid var(--color-christmas-green);
+}
+
+.christmas-info-box {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+  border-color: var(--color-christmas-green);
+}
+
+.btn {
+  @apply shadow-sm transition-all duration-200 ease-out;
+  text-transform: none;
+  font-weight: 500;
+  border-radius: 0.5rem;
+}
+
+.btn:hover {
+  @apply -translate-y-[1px] shadow-md;
+}
+
+.btn-primary {
+  @apply bg-primary text-primary-content border-primary;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn.btn-ghost {
+  @apply shadow-none bg-transparent hover:bg-base-200;
+}
+
+.btn-minimal {
+  @apply btn btn-ghost shadow-none hover:shadow-none hover:bg-transparent hover:underline px-2 h-auto min-h-0;
+}
+
+.link {
+  text-underline-offset: 2px;
+  transition: all 0.2s ease;
+}
+
+.link:hover {
+  opacity: 80%;
+}
+
+/* Card & Component Styles */
+.card-minimal {
+  @apply border border-base-content/10 shadow-sm p-6 sm:p-8 bg-base-100 rounded-xl transition-all duration-300 ease-out;
+  box-shadow: 0 1px 3px var(--color-shadow-soft);
+}
+
+.card-minimal:hover {
+  box-shadow: 0 4px 12px var(--color-shadow-soft);
+}
+
+.hyperblog-card {
+  @apply transition-all duration-300 ease-out bg-base-100 rounded-xl;
+}
+
+/* Animation Utilities */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes snowfall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+.animate-snowfall {
+  animation: snowfall 10s linear infinite;
+}
+
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Spacing Consistency */
+.space-y-section > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(3rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(3rem * var(--tw-space-y-reverse));
+}
+
+.space-y-component > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
+.space-y-element > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+/* Custom prose styling for markdown content */
+.prose {
+  --prose-body: var(--color-base-content);
+  --prose-headings: var(--color-base-content);
+  --prose-links: var(--color-primary);
+  --prose-bold: var(--color-base-content);
+  --prose-code: var(--color-accent);
+  --prose-pre-bg: var(--color-base-300);
+  --prose-pre-border: var(--color-base-content);
+  --prose-quotes: var(--color-base-content);
+  --prose-quote-border: var(--color-primary);
+  --prose-captions: var(--color-base-content);
+  --prose-th-borders: var(--color-base-content);
+  --prose-td-borders: var(--color-base-content);
+}
+
+.prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~="not-prose"] *)) {
+  font-family: var(--font-lora), serif;
+  letter-spacing: -0.02em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.prose :where(p):not(:where([class~="not-prose"] *)) {
+  line-height: 1.7;
+}
+
+.prose :where(a):not(:where([class~="not-prose"] *)) {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.prose :where(a):not(:where([class~="not-prose"] *)):hover {
+  border-bottom-color: currentColor;
+}
+
+.prose blockquote {
+  border-left-color: var(--color-primary);
+  background-color: var(--color-base-200);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-style: italic;
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.prose thead {
+  background-color: var(--color-base-200);
+  border-bottom: 2px solid var(--color-base-content, currentColor);
+}
+
+.prose th,
+.prose td {
+  padding: 0.75rem;
+  border: 1px solid var(--color-base-content, currentColor);
+}
+
+.prose tbody tr:nth-child(even) {
+  background-color: var(--color-base-200);
+}
+
+/* Dark theme prose overrides - using DaisyUI data-theme attribute */
+[data-theme="dark"] .prose {
+  --prose-body: var(--color-base-content);
+  --prose-headings: var(--color-base-content);
+  --prose-links: var(--color-primary);
+  --prose-bold: var(--color-base-content);
+  --prose-code: var(--color-accent);
+  --prose-pre-bg: var(--color-base-300);
+  --prose-pre-border: var(--color-base-content);
+  --prose-quotes: var(--color-base-content);
+  --prose-quote-border: var(--color-primary);
+}
+
+/* Modal-specific scroll customizations */
+.modal-box {
+  scroll-behavior: smooth;
+}
+
+.modal-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+  background: var(--color-base-200);
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+  background: var(--color-base-300);
+  border-radius: 4px;
+}
+
+.modal-box::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Enhanced typography for card content */
+.blog-section {
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+}
+
+.blog-section h3 {
+  line-height: 1.3;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-lora), serif;
+}
+
+.blog-section p {
+  margin-bottom: 1rem;
+}
+
+/* Card Feed Enhanced Typography */
+.hyperblog-preview {
+  line-height: 1.7;
+  letter-spacing: 0.015em;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.hyperblog-title {
+  line-height: 1.3;
+  font-weight: 600;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-family: var(--font-lora), serif;
+}
+
+.hyperblog-metadata {
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .hyperblog-preview {
+    line-height: 1.6;
+  }
+}
+
+/* TOC-specific styles */
+.toc-item {
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.toc-item.active {
+  border-left-color: var(--color-christmas-red);
+  background-color: var(--color-base-200);
+  font-weight: 600;
+}
+
+/* Scroll offset for sticky header */
+.scroll-mt-20 {
+  scroll-margin-top: 5rem;
+}
+
+/* Mobile modal spacing */
+@media (max-width: 640px) {
+  .modal-box {
+    padding: 0;
+  }
+}
+

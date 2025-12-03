@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Christmas Tree -->
+  <polygon points="50,10 20,70 80,70" fill="#228b22"/>
+  <polygon points="50,25 25,65 75,65" fill="#2e8b2e"/>
+  <polygon points="50,40 32,60 68,60" fill="#32cd32"/>
+  
+  <!-- Tree trunk -->
+  <rect x="42" y="70" width="16" height="15" fill="#8b4513"/>
+  
+  <!-- Star on top -->
+  <polygon points="50,5 52,12 60,12 54,17 56,24 50,20 44,24 46,17 40,12 48,12" fill="#ffd700"/>
+  
+  <!-- Ornaments -->
+  <circle cx="35" cy="50" r="4" fill="#c41e3a"/>
+  <circle cx="65" cy="50" r="4" fill="#c41e3a"/>
+  <circle cx="50" cy="55" r="4" fill="#ffd700"/>
+  <circle cx="42" cy="40" r="3" fill="#4169e1"/>
+  <circle cx="58" cy="40" r="3" fill="#4169e1"/>
+  
+  <!-- Bonfire flames at base -->
+  <ellipse cx="50" cy="90" rx="20" ry="8" fill="#ff6b00"/>
+  <ellipse cx="50" cy="88" rx="15" ry="6" fill="#ff8c00"/>
+  <ellipse cx="50" cy="86" rx="10" ry="4" fill="#ffd700"/>
+</svg>
+

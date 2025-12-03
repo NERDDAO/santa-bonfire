@@ -1,0 +1,120 @@
+"use client";
+
+import React, { useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { hardhat } from "viem/chains";
+import { Bars3Icon, FolderIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { WhatIsHyperCardsModal } from "~~/components/WhatIsHyperCardsModal";
+import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
+
+type HeaderMenuLink = {
+  label: string;
+  href: string;
+  icon?: React.ReactNode;
+};
+
+export const menuLinks: HeaderMenuLink[] = [
+  {
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "Bonfires",
+    href: "/data-rooms",
+    icon: <FolderIcon className="h-4 w-4" />,
+  },
+  {
+    label: "How It Works",
+    href: "/how-it-works",
+    icon: <InformationCircleIcon className="h-4 w-4" />,
+  },
+];
+
+export const HeaderMenuLinks = () => {
+  const pathname = usePathname();
+
+  return (
+    <>
+      {menuLinks.map(({ label, href, icon }) => {
+        const isActive = pathname === href;
+        return (
+          <li key={href}>
+            <Link
+              href={href}
+              passHref
+              className={`${
+                isActive ? "bg-base-200 font-semibold" : ""
+              } hover:bg-base-200 active:!text-neutral py-2 px-4 text-sm rounded-full gap-2 grid grid-flow-col transition-all duration-200`}
+            >
+              {icon}
+              <span>{label}</span>
+            </Link>
+          </li>
+        );
+      })}
+    </>
+  );
+};
+
+/**
+ * Site header with Christmas theming
+ */
+export const Header = () => {
+  const { targetNetwork } = useTargetNetwork();
+  const isLocalNetwork = targetNetwork.id === hardhat.id;
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+
+  const burgerMenuRef = useRef<HTMLDetailsElement>(null);
+  useOutsideClick(burgerMenuRef, () => {
+    burgerMenuRef?.current?.removeAttribute("open");
+  });
+
+  return (
+    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 shrink-0 justify-between z-20 shadow-sm border-b border-base-content/5 px-0 sm:px-4">
+      <div className="navbar-start w-auto lg:w-1/2">
+        <details className="dropdown" ref={burgerMenuRef}>
+          <summary className="ml-1 btn btn-ghost lg:hidden hover:bg-transparent">
+            <Bars3Icon className="h-1/2" />
+          </summary>
+          <ul
+            className="menu menu-compact dropdown-content mt-3 p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-content/5"
+            onClick={() => {
+              burgerMenuRef?.current?.removeAttribute("open");
+            }}
+          >
+            <HeaderMenuLinks />
+          </ul>
+        </details>
+        <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0 group">
+          <div className="flex relative w-10 h-10">
+            <Image alt="Santa Bonfire logo" className="cursor-pointer" fill src="/logo.svg" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold leading-tight font-serif text-xl tracking-tight text-christmas-red">🎄 Santa Bonfire</span>
+            <span className="text-xs text-base-content/60">AI Christmas Cards</span>
+          </div>
+        </Link>
+        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
+          <HeaderMenuLinks />
+        </ul>
+      </div>
+      <div className="navbar-end grow mr-4 gap-2">
+        <button
+          className="btn btn-ghost btn-sm btn-circle hover:bg-base-200 transition-colors"
+          onClick={() => setIsInfoModalOpen(true)}
+          aria-label="What are Christmas Cards?"
+        >
+          <InformationCircleIcon className="h-5 w-5 opacity-70" />
+        </button>
+        <RainbowKitCustomConnectButton />
+        {isLocalNetwork && <FaucetButton />}
+      </div>
+
+      <WhatIsHyperCardsModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
+    </div>
+  );
+};
+

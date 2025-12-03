@@ -1,0 +1,290 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { DataRoomMarketplaceCard } from "@/components/DataRoomMarketplaceCard";
+import { DataRoomWizard } from "@/components/DataRoomWizard";
+import type { CreateDataRoomRequest, DataRoomConfig, DataRoomInfo, DataRoomListResponse } from "@/lib/types/delve-api";
+import { notification } from "@/utils/scaffold-eth/notification";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+
+export default function DataRoomsPage() {
+  const { address, isConnected } = useAccount();
+
+  // State management
+  const [dataRooms, setDataRooms] = useState<DataRoomInfo[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+
+  // Fetch bonfires from marketplace
+  const fetchDataRooms = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/datarooms?limit=50&offset=0");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+      const data: DataRoomListResponse = await response.json();
+      setDataRooms(data.datarooms);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch bonfires";
+      setError(errorMessage);
+      console.error("Error fetching bonfires:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch on mount (regardless of wallet connection)
+  useEffect(() => {
+    fetchDataRooms();
+  }, []);
+
+  // Wizard handlers
+  const handleOpenWizard = () => {
+    if (!isConnected) {
+      notification.error("Please connect your wallet to create a bonfire");
+      return;
+    }
+    setIsWizardOpen(true);
+  };
+
+  const handleCloseWizard = () => {
+    setIsWizardOpen(false);
+  };
+
+  const handleWizardComplete = async (config: DataRoomConfig) => {
+    if (!address) {
+      notification.error("Please connect your wallet");
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      // Build request with creator_wallet from connected wallet
+      const requestBody: CreateDataRoomRequest = {
+        creator_wallet: address,
+        bonfire_id: config.bonfireId,
+        description: config.description,
+        system_prompt: config.systemPrompt || "", // Backend requires system_prompt even if empty
+        center_node_uuid: config.centerNodeUuid,
+        price_usd: config.priceUsd,
+        query_limit: config.queryLimit,
+        expiration_days: config.expirationDays,
+        // Add dynamic pricing fields if enabled
+        ...(config.dynamicPricingEnabled && {
+          dynamic_pricing_enabled: config.dynamicPricingEnabled,
+          price_step_usd: config.priceStepUsd || 0.0,
+          price_decay_rate: config.priceDecayRate || 0.0,
+        }),
+      };
+
+      const response = await fetch("/api/datarooms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+
+      const createdDataRoom: DataRoomInfo = await response.json();
+      notification.success(`🎄 Bonfire created successfully! ID: ${createdDataRoom.id}`);
+
+      // Refetch data rooms
+      await fetchDataRooms();
+
+      // Close wizard
+      setIsWizardOpen(false);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create bonfire";
+      notification.error(errorMessage);
+      console.error("Error creating bonfire:", err);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
+            <p className="text-base-content/70">
+              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+            </p>
+          </div>
+          <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
+            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
+            Create Bonfire
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="skeleton h-64 w-full"></div>
+          ))}
+        </div>
+
+        <DataRoomWizard isOpen={isWizardOpen} onClose={handleCloseWizard} onComplete={handleWizardComplete} />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error && !loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
+            <p className="text-base-content/70">
+              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+            </p>
+          </div>
+          <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
+            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
+            Create Bonfire
+          </button>
+        </div>
+
+        <div className="alert alert-error shadow-lg">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <div>
+            <h3 className="font-bold">Error loading bonfires</h3>
+            <div className="text-sm">{error}</div>
+          </div>
+          <button onClick={fetchDataRooms} className="btn btn-sm btn-ghost">
+            Retry
+          </button>
+        </div>
+
+        <DataRoomWizard isOpen={isWizardOpen} onClose={handleCloseWizard} onComplete={handleWizardComplete} />
+      </div>
+    );
+  }
+
+  // Empty state
+  if (dataRooms.length === 0 && !loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
+            <p className="text-base-content/70">
+              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+            </p>
+          </div>
+          <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
+            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
+            Create Bonfire
+          </button>
+        </div>
+
+        <div className="alert alert-info shadow-lg">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <div>
+            <h3 className="font-bold">No bonfires available</h3>
+            <div className="text-sm">No bonfires available yet. Be the first to light one up! 🔥</div>
+          </div>
+        </div>
+
+        <DataRoomWizard isOpen={isWizardOpen} onClose={handleCloseWizard} onComplete={handleWizardComplete} />
+      </div>
+    );
+  }
+
+  // Bonfires grid
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-8">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
+            <p className="text-base-content/70">
+              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+            </p>
+            <div className="mt-2 text-sm opacity-70">
+              Found {dataRooms.length} bonfire{dataRooms.length !== 1 ? "s" : ""} 🔥
+            </div>
+            {!isConnected && (
+              <div className="alert alert-info mt-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-current shrink-0 w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <div>
+                  <h3 className="font-bold">Connect your wallet</h3>
+                  <div className="text-sm">Connect your wallet to create bonfires and Christmas cards.</div>
+                </div>
+                <div>
+                  <ConnectButton />
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button onClick={fetchDataRooms} className="btn btn-ghost btn-sm gap-2" disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-xs"></span> : "🔄"}
+              Refresh
+            </button>
+            <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
+              {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
+              Create Bonfire
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {dataRooms.map(dataroom => (
+          <DataRoomMarketplaceCard key={dataroom.id} dataroom={dataroom} onHyperCardCreated={() => fetchDataRooms()} />
+        ))}
+      </div>
+
+      <DataRoomWizard isOpen={isWizardOpen} onClose={handleCloseWizard} onComplete={handleWizardComplete} />
+    </div>
+  );
+}
+
