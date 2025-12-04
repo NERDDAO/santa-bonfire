@@ -68,4 +68,3 @@ export interface BuildPaymentHeaderParams {
   userAddress: string;
   validDuration?: number;
 }
-

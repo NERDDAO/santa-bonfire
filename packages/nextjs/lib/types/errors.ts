@@ -6,6 +6,7 @@ export interface ApiError {
   message: string;
   details?: string;
   status?: number;
+  statusCode?: number;
 }
 
 /**
@@ -40,6 +41,7 @@ export async function createErrorFromResponse(response: Response): Promise<ApiEr
     message,
     details,
     status: response.status,
+    statusCode: response.status,
   };
 }
 
@@ -54,4 +56,3 @@ export function isApiError(error: unknown): error is ApiError {
     typeof (error as ApiError).message === "string"
   );
 }
-
