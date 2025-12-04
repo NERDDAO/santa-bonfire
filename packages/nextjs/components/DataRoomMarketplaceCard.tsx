@@ -9,6 +9,14 @@ import { formatTimestamp, truncateAddress, truncateText } from "@/lib/utils";
 import { notification } from "@/utils/scaffold-eth/notification";
 import { useAccount } from "wagmi";
 
+interface PreviewEntity {
+  uuid?: string;
+  id?: string;
+  entity_type?: string;
+  name?: string;
+  summary?: string;
+}
+
 interface DataRoomMarketplaceCardProps {
   dataroom: DataRoomInfo;
   className?: string;
@@ -409,15 +417,13 @@ export function DataRoomMarketplaceCard({
               <div className="space-y-2">
                 <p className="text-xs font-semibold opacity-80">Preview Entities:</p>
                 <div className="space-y-1">
-                  {preview.entities.slice(0, 5).map((entity: Record<string, unknown>) => (
-                    <div key={(entity.uuid || entity.id) as string} className="text-xs bg-base-200 p-2 rounded">
+                  {(preview.entities as PreviewEntity[]).slice(0, 5).map(entity => (
+                    <div key={entity.uuid || entity.id} className="text-xs bg-base-200 p-2 rounded">
                       <div className="flex items-center gap-2">
-                        <span className="badge badge-xs badge-primary">{(entity.entity_type || "Entity") as string}</span>
-                        <span className="font-semibold">{(entity.name || "Unnamed") as string}</span>
+                        <span className="badge badge-xs badge-primary">{entity.entity_type || "Entity"}</span>
+                        <span className="font-semibold">{entity.name || "Unnamed"}</span>
                       </div>
-                      {typeof entity.summary === "string" && entity.summary && (
-                        <p className="opacity-70 mt-1 line-clamp-2">{entity.summary}</p>
-                      )}
+                      {entity.summary && <p className="opacity-70 mt-1 line-clamp-2">{entity.summary}</p>}
                     </div>
                   ))}
                 </div>
