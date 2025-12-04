@@ -80,6 +80,10 @@ const defaultAgentId = process.env.NEXT_PUBLIC_DEFAULT_AGENT_ID || "";
 const isDevelopment = process.env.NODE_ENV === "development";
 const isProduction = process.env.NODE_ENV === "production";
 
+// Santa Bonfire Configuration (optional - feature disabled if not configured)
+const santaDataroomId = process.env.NEXT_PUBLIC_SANTA_DATAROOM_ID || "";
+const santaAgentId = process.env.NEXT_PUBLIC_SANTA_AGENT_ID || "";
+
 export const config = {
   delve: { apiUrl: delveApiUrl, timeout: 30000 },
   payment: {
@@ -93,4 +97,11 @@ export const config = {
     expirationDays,
   },
   app: { isDevelopment, isProduction, defaultAgentId: defaultAgentId || undefined },
+  // Santa Bonfire - bonus chat access for card purchasers
+  santaBonfire: santaDataroomId && santaAgentId
+    ? {
+        dataroomId: santaDataroomId,
+        agentId: santaAgentId,
+      }
+    : undefined,
 } as const;

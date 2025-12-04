@@ -4,10 +4,12 @@ import { createErrorFromResponse } from "@/lib/types/errors";
 
 /**
  * Banner response from the Delve backend.
- * This route is specific to santa-bonfire and automatically requests Christmas-themed banners.
+ * This route delegates to the hyperblog banner endpoint, treating cardId as hyperblogId.
  *
- * @see /api/hypercards/[cardId]/image - Alias endpoint that delegates to this route
- *      (treats cardId as hyperblogId for HyperCard naming convention)
+ * This endpoint provides an alias for /api/hyperblogs/[hyperblogId]/banner
+ * to support the HyperCard naming convention while maintaining backward compatibility.
+ *
+ * @see /api/hyperblogs/[hyperblogId]/banner for the canonical endpoint
  */
 interface BannerResponse {
   banner_url: string;
@@ -16,16 +18,26 @@ interface BannerResponse {
   enhanced?: boolean; // Indicates if Christmas enhancement was applied
 }
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ hyperblogId: string }> }) {
+/**
+ * POST /api/hypercards/[cardId]/image
+ *
+ * Generates or retrieves a banner image for the HyperCard (Christmas card).
+ * This is an alias for /api/hyperblogs/[hyperblogId]/banner that treats
+ * cardId as the underlying hyperblogId.
+ *
+ * All santa-bonfire requests automatically include Christmas enhancement.
+ */
+export async function POST(request: NextRequest, { params }: { params: Promise<{ cardId: string }> }) {
   try {
-    const { hyperblogId } = await params;
+    const { cardId } = await params;
 
-    if (!hyperblogId) {
-      return NextResponse.json({ error: "Invalid hyperblogId" }, { status: 400 });
+    if (!cardId) {
+      return NextResponse.json({ error: "Invalid cardId" }, { status: 400 });
     }
 
+    // Delegate to the Delve backend using cardId as hyperblogId
     // Request Christmas-enhanced banners for all santa-bonfire card images
-    const delveUrl = `${config.delve.apiUrl}/datarooms/hyperblogs/${hyperblogId}/banner?enhance_for_christmas=true`;
+    const delveUrl = `${config.delve.apiUrl}/datarooms/hyperblogs/${cardId}/banner?enhance_for_christmas=true`;
 
     // Longer timeout for image generation (30 seconds)
     const delveResponse = await fetch(delveUrl, {
@@ -49,18 +61,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const bannerData: BannerResponse = await delveResponse.json();
 
-    console.log("🎄 Christmas banner generated:", {
-      hyperblog_id: hyperblogId,
+    console.log("🎄 Christmas card image generated:", {
+      card_id: cardId,
       cached: bannerData.cached,
       enhanced: bannerData.enhanced,
     });
 
     return NextResponse.json(bannerData, { status: 200 });
   } catch (error) {
-    console.error("Error in HyperBlog banner API route:", error);
+    console.error("Error in HyperCard image API route:", error);
 
     if (error instanceof Error && error.name === "TimeoutError") {
-      return NextResponse.json({ error: "Request timeout. Banner generation took too long." }, { status: 503 });
+      return NextResponse.json({ error: "Request timeout. Image generation took too long." }, { status: 503 });
     }
 
     if (error instanceof Error && error.message.includes("fetch")) {
@@ -87,3 +99,5 @@ export async function OPTIONS() {
     },
   });
 }
+
+

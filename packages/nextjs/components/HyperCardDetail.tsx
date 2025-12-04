@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MarkdownRenderer } from "./MarkdownRenderer";
-import { HyperBlogInfo } from "@/lib/types/delve-api";
+import { HyperBlogInfo, SantaBonfireAccess } from "@/lib/types/delve-api";
 import { calculateReadingTime } from "@/lib/utils";
 import { notification } from "@/utils/scaffold-eth/notification";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -78,6 +78,9 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [copiedSectionId, setCopiedSectionId] = useState<string | null>(null);
+
+  // Santa Bonfire Access State
+  const [santaBonfireAccess, setSantaBonfireAccess] = useState<SantaBonfireAccess | null>(null);
 
   // Refs
   const tocRef = useRef<HTMLDivElement | null>(null);
@@ -172,6 +175,25 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
   useEffect(() => {
     fetchFullContent();
   }, [fetchFullContent]);
+
+  /**
+   * Check for Santa Bonfire access in localStorage
+   */
+  useEffect(() => {
+    const checkSantaAccess = () => {
+      try {
+        const storedAccess = localStorage.getItem(`santa_bonfire_access_${blog.id}`);
+        if (storedAccess) {
+          const parsed = JSON.parse(storedAccess) as SantaBonfireAccess;
+          setSantaBonfireAccess(parsed);
+        }
+      } catch (err) {
+        console.error("Error loading Santa Bonfire access from localStorage:", err);
+      }
+    };
+
+    checkSantaAccess();
+  }, [blog.id]);
 
   /**
    * Generate Banner Image
@@ -572,17 +594,21 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           {/* Banner Loading State */}
           {isBannerLoading && (
-            <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-base-200 animate-pulse">
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-                <span className="text-sm opacity-70">🎄 Creating your card image...</span>
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-christmas-red/10 via-christmas-green/10 to-christmas-gold/10 animate-pulse">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <div className="relative">
+                  <span className="loading loading-spinner loading-lg text-christmas-red"></span>
+                  <span className="absolute -top-2 -right-2 text-2xl animate-bounce">✨</span>
+                </div>
+                <span className="text-base font-medium text-christmas-green">🎨 Crafting your magical Christmas card...</span>
+                <span className="text-sm opacity-60">This may take a moment</span>
               </div>
             </div>
           )}
 
           {/* Banner Image Display */}
           {bannerUrl && !bannerError && !isBannerLoading && (
-            <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-lg christmas-card-border">
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg christmas-card-border christmas-card-image-container">
               <Image
                 src={bannerUrl}
                 alt={`Christmas Card: ${currentCard.user_query}`}
@@ -592,19 +618,61 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
                 unoptimized
               />
               {bannerCached && (
-                <div className="absolute top-2 right-2 badge badge-sm badge-ghost bg-base-100/80 gap-1">
+                <div className="absolute top-2 right-2 badge badge-sm badge-ghost bg-base-100/80 gap-1 backdrop-blur-sm">
+                  <span className="text-xs">❄️</span>
                   <Check className="w-3 h-3" />
                   Cached
                 </div>
               )}
+              {/* Download Button - appears on hover */}
+              <button
+                className="christmas-download-button"
+                onClick={async () => {
+                  try {
+                    const response = await fetch(bannerUrl);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    const sanitizedName = currentCard.user_query.replace(/[^a-z0-9]/gi, "_").slice(0, 50);
+                    a.download = `christmas-card-${sanitizedName}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    notification.success("🎁 Card image downloaded!");
+                  } catch {
+                    notification.error("Failed to download image");
+                  }
+                }}
+                aria-label="Download card image"
+              >
+                📥 Download Card
+              </button>
             </div>
           )}
 
           {/* Banner Error/Fallback State */}
           {(bannerError || (!bannerUrl && !isBannerLoading && fullCardContent?.image_prompt)) && !isBannerLoading && (
-            <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-christmas-red/20 via-christmas-green/20 to-christmas-gold/20">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-lg font-medium opacity-60 text-center px-4">🎄 {currentCard.user_query}</span>
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-christmas-red/30 via-christmas-gold/20 to-christmas-green/30 christmas-card-border">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6">
+                <span className="text-4xl">🎄</span>
+                <span className="text-lg font-medium text-center max-w-md">{currentCard.user_query}</span>
+                <span className="text-sm opacity-70 text-center">✨ Image generation in progress. This may take a moment...</span>
+                <button
+                  className="btn btn-sm btn-primary gap-2 mt-2"
+                  onClick={() => {
+                    setBannerError(false);
+                    generateBanner();
+                  }}
+                  disabled={isBannerLoading}
+                >
+                  {isBannerLoading ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    <>🎨 Generate Image</>
+                  )}
+                </button>
               </div>
             </div>
           )}
@@ -802,6 +870,34 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
                     </div>
                   )}
                 </>
+              )}
+
+              {/* Santa Bonfire Access Banner */}
+              {santaBonfireAccess && userAddress && blog.author_wallet.toLowerCase() === userAddress.toLowerCase() && (
+                <div className="mt-12 pt-8 border-t border-base-200">
+                  <div className="christmas-card-bg rounded-2xl p-6 sm:p-8 text-center space-y-4 border-2 border-christmas-gold/30 shadow-lg">
+                    <div className="text-4xl animate-bounce">🎅</div>
+                    <h3 className="text-2xl font-bold font-serif text-christmas-red">
+                      🎄 You&apos;ve Unlocked Santa&apos;s Bonfire! 🎅
+                    </h3>
+                    <p className="text-base-content/80 max-w-md mx-auto">
+                      Chat with Santa and help create the next Christmas card by contributing to the knowledge graph.
+                      You have <span className="font-bold text-christmas-green">{santaBonfireAccess.queries_remaining}</span> messages remaining!
+                    </p>
+                    <div className="flex justify-center gap-4 pt-2">
+                      <Link
+                        href={`/santa-bonfire?microsub=${santaBonfireAccess.microsub_tx_hash}`}
+                        className="btn btn-primary gap-2 christmas-button"
+                      >
+                        <span>🎅</span>
+                        Chat with Santa →
+                      </Link>
+                    </div>
+                    <p className="text-xs text-base-content/50 mt-2">
+                      ❄️ Your conversations help make future Christmas cards more magical! ❄️
+                    </p>
+                  </div>
+                </div>
               )}
 
               {/* Comments Section */}

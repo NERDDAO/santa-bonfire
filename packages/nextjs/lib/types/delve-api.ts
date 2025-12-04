@@ -442,11 +442,23 @@ export interface PurchaseHyperBlogRequest {
 }
 
 /**
+ * Santa Bonfire access information granted after card purchase
+ */
+export interface SantaBonfireAccess {
+  microsub_tx_hash: string;
+  dataroom_id: string;
+  agent_id: string;
+  queries_remaining: number;
+}
+
+/**
  * Response from HyperBlog purchase endpoint
  */
 export interface PurchaseHyperBlogResponse {
   hyperblog: HyperBlogInfo;
   payment: PaymentMetadata;
+  /** Santa Bonfire access granted as bonus for card purchase (optional) */
+  santa_bonfire_access?: SantaBonfireAccess;
 }
 
 /**

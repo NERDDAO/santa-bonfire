@@ -253,7 +253,23 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
       setHypercardId(createdHypercardId);
       setGenerationStatus(status);
 
-      notification.success("🎁 Card purchase successful! Creating your magical card...");
+      // Store Santa Bonfire access in localStorage if granted
+      if (data.santa_bonfire_access) {
+        try {
+          localStorage.setItem(
+            `santa_bonfire_access_${createdHypercardId}`,
+            JSON.stringify(data.santa_bonfire_access),
+          );
+          notification.success("🎄 Card created! You've also unlocked access to Santa's Bonfire! 🎅", {
+            duration: 6000,
+          });
+        } catch (err) {
+          console.error("Failed to store Santa Bonfire access:", err);
+          notification.success("🎁 Card purchase successful! Creating your magical card...");
+        }
+      } else {
+        notification.success("🎁 Card purchase successful! Creating your magical card...");
+      }
 
       // Start polling if generating
       if (status === "generating") {
