@@ -209,7 +209,8 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
                     <span className="text-base mt-3 text-christmas-green font-medium">
                       🎨 Creating your magical postcard...
                     </span>
-                    <span className="text-xs opacity-60 mt-1">This may take up to 30 seconds</span>
+                    <span className="text-xs opacity-60 mt-1">AI image generation can take 30-90 seconds</span>
+                    <span className="text-xs opacity-40 mt-1">Please wait while FLUX creates your image</span>
                   </div>
                 </div>
               ) : bannerUrl && !bannerError ? (

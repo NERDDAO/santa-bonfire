@@ -39,13 +39,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Request Christmas-enhanced banners for all santa-bonfire card images
     const delveUrl = `${config.delve.apiUrl}/datarooms/hyperblogs/${cardId}/banner?enhance_for_christmas=true`;
 
-    // Longer timeout for image generation (30 seconds)
+    console.log(`🎄 Requesting banner generation for card ${cardId}`);
+
+    // Extended timeout for fal.ai queue-based image generation (90 seconds)
     const delveResponse = await fetch(delveUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(90000),
     });
 
     if (!delveResponse.ok) {
