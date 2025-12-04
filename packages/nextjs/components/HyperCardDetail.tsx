@@ -229,13 +229,11 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
   }, [blog.id, bannerUrl, isBannerLoading]);
 
   /**
-   * Trigger banner generation when content is loaded
+   * NOTE: Auto-banner generation disabled to save costs.
+   * Users must click "Generate Image" button manually.
+   * Each fal.ai FLUX generation costs money.
    */
-  useEffect(() => {
-    if (fullCardContent && fullCardContent.image_prompt && !fullCardContent.banner_url && !bannerUrl) {
-      generateBanner();
-    }
-  }, [fullCardContent, generateBanner, bannerUrl]);
+  // Auto-trigger removed - manual generation only via button click
 
   /**
    * Initialize banner state from card data

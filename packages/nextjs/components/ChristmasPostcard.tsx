@@ -37,7 +37,6 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
   const [isBannerLoading, setIsBannerLoading] = useState<boolean>(false);
   const [bannerError, setBannerError] = useState<boolean>(false);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
-  const [hasAttemptedAutoGenerate, setHasAttemptedAutoGenerate] = useState(false);
 
   /**
    * Generate banner image via API
@@ -73,21 +72,11 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
   }, [blog.id, bannerUrl, isBannerLoading, onImageGenerated]);
 
   /**
-   * Auto-generate banner if we have an image prompt but no banner
-   * Uses a flag to ensure we only try auto-generation once on mount
+   * NOTE: Auto-generation disabled to save costs.
+   * Users must click "Generate Image" button to create banner.
+   * Each generation costs money via fal.ai API.
    */
-  useEffect(() => {
-    // Only auto-generate once on mount if conditions are met
-    if (!hasAttemptedAutoGenerate && blog.image_prompt && !blog.banner_url && !bannerUrl && !isBannerLoading) {
-      console.log("🎄 ChristmasPostcard: Auto-generating banner image", { 
-        blogId: blog.id,
-        hasPrompt: !!blog.image_prompt, 
-        bannerUrl: blog.banner_url 
-      });
-      setHasAttemptedAutoGenerate(true);
-      generateBanner();
-    }
-  }, [blog.id, blog.image_prompt, blog.banner_url, bannerUrl, isBannerLoading, hasAttemptedAutoGenerate, generateBanner]);
+  // Auto-generation removed - manual trigger only
 
   /**
    * Download the postcard image
@@ -234,7 +223,6 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
                         onClick={(e) => {
                           e.stopPropagation();
                           setBannerError(false);
-                          setHasAttemptedAutoGenerate(false);
                           generateBanner();
                         }}
                       >
@@ -243,26 +231,28 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
                       </button>
                     </div>
                   ) : blog.image_prompt ? (
-                    <button
-                      className="btn btn-sm btn-primary gap-2 mt-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        generateBanner();
-                      }}
-                      disabled={isBannerLoading}
-                    >
-                      {isBannerLoading ? (
-                        <>
-                          <span className="loading loading-spinner loading-xs"></span>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="w-4 h-4" />
-                          🎨 Generate Image
-                        </>
-                      )}
-                    </button>
+                    <div className="flex flex-col items-center gap-2 mt-4">
+                      <button
+                        className="btn btn-sm btn-primary gap-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          generateBanner();
+                        }}
+                        disabled={isBannerLoading}
+                      >
+                        {isBannerLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-xs"></span>
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            🎨 Generate AI Image
+                          </>
+                        )}
+                      </button>
+                      <span className="text-xs opacity-50">Uses FLUX AI • Takes ~45 seconds</span>
+                    </div>
                   ) : (
                     <span className="text-sm opacity-60 mt-4">No image prompt available</span>
                   )}
