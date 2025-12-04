@@ -24,10 +24,20 @@ interface ChristmasPostcardProps {
  * - Download and share functionality
  */
 export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: ChristmasPostcardProps) => {
+  // Debug logging on mount
+  console.log("🎄 ChristmasPostcard mounted:", {
+    blogId: blog.id,
+    hasImagePrompt: !!blog.image_prompt,
+    imagePromptPreview: blog.image_prompt ? blog.image_prompt.substring(0, 100) + "..." : null,
+    bannerUrl: blog.banner_url,
+    generationStatus: blog.generation_status,
+  });
+
   const [bannerUrl, setBannerUrl] = useState<string | null>(blog.banner_url || null);
   const [isBannerLoading, setIsBannerLoading] = useState<boolean>(false);
   const [bannerError, setBannerError] = useState<boolean>(false);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [hasAttemptedAutoGenerate, setHasAttemptedAutoGenerate] = useState(false);
 
   /**
    * Generate banner image via API
@@ -35,6 +45,7 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
   const generateBanner = useCallback(async () => {
     if (bannerUrl || isBannerLoading) return;
 
+    console.log("🎄 ChristmasPostcard: Starting image generation for", blog.id);
     setIsBannerLoading(true);
     setBannerError(false);
 
@@ -44,14 +55,17 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate postcard image");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("🎄 ChristmasPostcard: API error", response.status, errorData);
+        throw new Error(errorData.error || "Failed to generate postcard image");
       }
 
       const data = await response.json();
+      console.log("🎄 ChristmasPostcard: Image generated successfully", data.banner_url);
       setBannerUrl(data.banner_url);
       onImageGenerated?.(data.banner_url);
     } catch (err) {
-      console.error("Error generating postcard image:", err);
+      console.error("🎄 ChristmasPostcard: Error generating image:", err);
       setBannerError(true);
     } finally {
       setIsBannerLoading(false);
@@ -60,12 +74,20 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
 
   /**
    * Auto-generate banner if we have an image prompt but no banner
+   * Uses a flag to ensure we only try auto-generation once on mount
    */
   useEffect(() => {
-    if (blog.image_prompt && !blog.banner_url && !bannerUrl) {
+    // Only auto-generate once on mount if conditions are met
+    if (!hasAttemptedAutoGenerate && blog.image_prompt && !blog.banner_url && !bannerUrl && !isBannerLoading) {
+      console.log("🎄 ChristmasPostcard: Auto-generating banner image", { 
+        blogId: blog.id,
+        hasPrompt: !!blog.image_prompt, 
+        bannerUrl: blog.banner_url 
+      });
+      setHasAttemptedAutoGenerate(true);
       generateBanner();
     }
-  }, [blog.image_prompt, blog.banner_url, bannerUrl, generateBanner]);
+  }, [blog.id, blog.image_prompt, blog.banner_url, bannerUrl, isBannerLoading, hasAttemptedAutoGenerate, generateBanner]);
 
   /**
    * Download the postcard image
@@ -180,10 +202,14 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
               {isBannerLoading ? (
                 <div className="postcard-loading">
                   <div className="postcard-loading-content">
-                    <span className="loading loading-spinner loading-lg text-christmas-red"></span>
-                    <span className="text-sm mt-2 text-christmas-green font-medium">
+                    <div className="relative">
+                      <span className="loading loading-spinner loading-lg text-christmas-red"></span>
+                      <span className="absolute -top-1 -right-1 text-xl animate-bounce">✨</span>
+                    </div>
+                    <span className="text-base mt-3 text-christmas-green font-medium">
                       🎨 Creating your magical postcard...
                     </span>
+                    <span className="text-xs opacity-60 mt-1">This may take up to 30 seconds</span>
                   </div>
                 </div>
               ) : bannerUrl && !bannerError ? (
@@ -199,18 +225,45 @@ export const ChristmasPostcard = ({ blog, className = "", onImageGenerated }: Ch
                 <div className="postcard-placeholder">
                   <span className="text-6xl mb-4">🎄</span>
                   <span className="text-lg font-serif text-center px-4">{blog.user_query}</span>
-                  {bannerError && (
+                  {bannerError ? (
+                    <div className="flex flex-col items-center gap-2 mt-4">
+                      <span className="text-sm text-error">Image generation failed</span>
+                      <button
+                        className="btn btn-sm btn-primary gap-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBannerError(false);
+                          setHasAttemptedAutoGenerate(false);
+                          generateBanner();
+                        }}
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Retry
+                      </button>
+                    </div>
+                  ) : blog.image_prompt ? (
                     <button
                       className="btn btn-sm btn-primary gap-2 mt-4"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setBannerError(false);
                         generateBanner();
                       }}
+                      disabled={isBannerLoading}
                     >
-                      <RefreshCw className="w-4 h-4" />
-                      Generate Image
+                      {isBannerLoading ? (
+                        <>
+                          <span className="loading loading-spinner loading-xs"></span>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="w-4 h-4" />
+                          🎨 Generate Image
+                        </>
+                      )}
                     </button>
+                  ) : (
+                    <span className="text-sm opacity-60 mt-4">No image prompt available</span>
                   )}
                 </div>
               )}
