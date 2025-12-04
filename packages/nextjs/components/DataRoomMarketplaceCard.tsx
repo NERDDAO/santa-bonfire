@@ -415,7 +415,9 @@ export function DataRoomMarketplaceCard({
                         <span className="badge badge-xs badge-primary">{(entity.entity_type || "Entity") as string}</span>
                         <span className="font-semibold">{(entity.name || "Unnamed") as string}</span>
                       </div>
-                      {entity.summary && <p className="opacity-70 mt-1 line-clamp-2">{entity.summary as string}</p>}
+                      {typeof entity.summary === "string" && entity.summary && (
+                        <p className="opacity-70 mt-1 line-clamp-2">{entity.summary}</p>
+                      )}
                     </div>
                   ))}
                 </div>
