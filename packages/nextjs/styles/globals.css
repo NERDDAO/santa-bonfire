@@ -588,3 +588,458 @@ body::before {
   }
 }
 
+/* ========================================
+   Christmas Postcard Styles
+   ======================================== */
+
+.christmas-postcard-container {
+  perspective: 1500px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.christmas-postcard {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.christmas-postcard.flipped {
+  transform: rotateY(180deg);
+}
+
+.postcard-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    0 8px 40px rgba(196, 30, 58, 0.1);
+}
+
+.postcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  background: linear-gradient(145deg, #fffef9 0%, #f5f0e8 100%);
+  border: 3px solid #8b4513;
+  border-radius: 12px;
+}
+
+/* Decorative corners */
+.postcard-corner {
+  position: absolute;
+  font-size: 1.5rem;
+  color: var(--color-christmas-gold);
+  opacity: 0.6;
+  z-index: 10;
+}
+
+.postcard-corner-tl { top: 0.5rem; left: 0.5rem; }
+.postcard-corner-tr { top: 0.5rem; right: 0.5rem; }
+.postcard-corner-bl { bottom: 0.5rem; left: 0.5rem; }
+.postcard-corner-br { bottom: 0.5rem; right: 0.5rem; }
+
+/* Front side styles */
+.postcard-front .postcard-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.postcard-image-area {
+  position: relative;
+  flex: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: linear-gradient(135deg, 
+    rgba(196, 30, 58, 0.1) 0%, 
+    rgba(34, 139, 34, 0.1) 50%,
+    rgba(255, 215, 0, 0.1) 100%
+  );
+  border: 2px solid rgba(139, 69, 19, 0.3);
+}
+
+.postcard-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.postcard-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.postcard-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, 
+    rgba(196, 30, 58, 0.15) 0%, 
+    rgba(34, 139, 34, 0.15) 100%
+  );
+}
+
+.postcard-caption {
+  text-align: center;
+  padding: 0.75rem 0 0.25rem;
+  font-size: 0.875rem;
+  color: #5c4033;
+}
+
+.postcard-flip-hint {
+  position: absolute;
+  bottom: 0.25rem;
+  right: 1rem;
+  font-size: 0.625rem;
+  color: rgba(139, 69, 19, 0.5);
+  letter-spacing: 0.05em;
+}
+
+/* Back side styles */
+.postcard-back {
+  transform: rotateY(180deg);
+}
+
+.postcard-back-inner {
+  display: flex;
+  flex-direction: column;
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 1.5rem,
+      rgba(139, 69, 19, 0.08) 1.5rem,
+      rgba(139, 69, 19, 0.08) 1.55rem
+    ),
+    linear-gradient(145deg, #fffef9 0%, #f5f0e8 100%);
+}
+
+.postcard-header {
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed rgba(139, 69, 19, 0.3);
+  margin-bottom: 0.5rem;
+}
+
+.postcard-title {
+  font-size: 1.25rem;
+  color: var(--color-christmas-red);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.postcard-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.postcard-message-area {
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.postcard-message {
+  font-family: 'Georgia', serif;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+  color: #3c2415;
+}
+
+.postcard-message .prose {
+  font-size: 0.75rem;
+  max-width: none;
+}
+
+.postcard-message .prose p {
+  margin: 0.5rem 0;
+}
+
+.postcard-message .prose h1,
+.postcard-message .prose h2,
+.postcard-message .prose h3 {
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+}
+
+.postcard-divider {
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(139, 69, 19, 0.4) 10%,
+    rgba(139, 69, 19, 0.4) 90%,
+    transparent 100%
+  );
+}
+
+.postcard-address-area {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0.5rem;
+}
+
+/* Stamp styles */
+.postcard-stamp {
+  width: 60px;
+  height: 72px;
+  background: linear-gradient(135deg, 
+    var(--color-christmas-red) 0%, 
+    #a01830 100%
+  );
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-end;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  transform: rotate(3deg);
+}
+
+.stamp-emoji {
+  font-size: 1.5rem;
+  margin-bottom: 0.125rem;
+}
+
+.stamp-text {
+  font-size: 0.5rem;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.stamp-value {
+  font-size: 0.4rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.125rem;
+}
+
+/* Postmark styles */
+.postcard-postmark {
+  position: relative;
+  margin: 0.5rem 0;
+}
+
+.postmark-circle {
+  width: 56px;
+  height: 56px;
+  border: 2px solid rgba(139, 69, 19, 0.6);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-15deg);
+  opacity: 0.7;
+}
+
+.postmark-text {
+  font-size: 0.35rem;
+  font-weight: 700;
+  color: #8b4513;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.postmark-date {
+  font-size: 0.4rem;
+  font-weight: 600;
+  color: #8b4513;
+  margin-top: 0.125rem;
+}
+
+/* Address styles */
+.postcard-address {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.address-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.125rem 0;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.address-line.address-to {
+  font-size: 0.875rem;
+}
+
+.address-line.address-bonfire {
+  border-bottom: none;
+}
+
+.address-label {
+  font-size: 0.625rem;
+  color: rgba(139, 69, 19, 0.6);
+  font-style: italic;
+  min-width: 2rem;
+}
+
+.address-value {
+  font-family: 'Georgia', serif;
+  font-size: 0.75rem;
+  color: #3c2415;
+}
+
+/* Action buttons */
+.postcard-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .christmas-postcard-container {
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+
+  .postcard-inner {
+    padding: 0.75rem;
+  }
+
+  .postcard-corner {
+    font-size: 1rem;
+  }
+
+  .postcard-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto auto;
+  }
+
+  .postcard-divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(139, 69, 19, 0.4) 10%,
+      rgba(139, 69, 19, 0.4) 90%,
+      transparent 100%
+    );
+  }
+
+  .postcard-address-area {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 0;
+    padding-top: 0.5rem;
+  }
+
+  .postcard-stamp {
+    align-self: center;
+    width: 48px;
+    height: 58px;
+  }
+
+  .stamp-emoji {
+    font-size: 1.25rem;
+  }
+
+  .postcard-postmark {
+    margin: 0 0.5rem;
+  }
+
+  .postmark-circle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .postcard-address {
+    flex: 0;
+  }
+
+  .postcard-message {
+    font-size: 0.6875rem;
+    line-height: 1.4rem;
+  }
+
+  .postcard-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* Dark theme adjustments for postcard */
+[data-theme="dark"] .postcard-inner {
+  background: linear-gradient(145deg, #2a2520 0%, #1a1815 100%);
+  border-color: #6b4423;
+}
+
+[data-theme="dark"] .postcard-back-inner {
+  background: 
+    repeating-linear-gradient(
+      transparent,
+      transparent 1.5rem,
+      rgba(107, 68, 35, 0.15) 1.5rem,
+      rgba(107, 68, 35, 0.15) 1.55rem
+    ),
+    linear-gradient(145deg, #2a2520 0%, #1a1815 100%);
+}
+
+[data-theme="dark"] .postcard-caption {
+  color: #c4a882;
+}
+
+[data-theme="dark"] .postcard-message,
+[data-theme="dark"] .address-value {
+  color: #d4c4b0;
+}
+
+[data-theme="dark"] .address-label {
+  color: rgba(196, 168, 130, 0.6);
+}
+
+[data-theme="dark"] .postmark-text,
+[data-theme="dark"] .postmark-date {
+  color: #a08060;
+}
+
+[data-theme="dark"] .postcard-divider {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(107, 68, 35, 0.5) 10%,
+    rgba(107, 68, 35, 0.5) 90%,
+    transparent 100%
+  );
+}
+
+[data-theme="dark"] .postcard-flip-hint {
+  color: rgba(196, 168, 130, 0.5);
+}
+
+[data-theme="dark"] .postcard-header {
+  border-bottom-color: rgba(107, 68, 35, 0.4);
+}
+
+[data-theme="dark"] .address-line {
+  border-bottom-color: rgba(107, 68, 35, 0.3);
+}
+

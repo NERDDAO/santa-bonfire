@@ -365,11 +365,16 @@ export interface BlogContent {
     htn_graph_hash: string;
     user_query: string;
     dataroom_description: string;
+    blog_length: "short" | "medium" | "long";
+    generation_mode?: "blog" | "card";
     sections_generated: number;
     sections_failed?: number;
     failed_node_ids?: string[];
     generated_at: string;
+    summary?: string;
   };
+  summary?: string;
+  image_prompt?: string;
 }
 
 /**

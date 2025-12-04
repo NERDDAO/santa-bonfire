@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ChristmasPostcard } from "./ChristmasPostcard";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { HyperBlogInfo, SantaBonfireAccess } from "@/lib/types/delve-api";
 import { calculateReadingTime } from "@/lib/utils";
@@ -72,6 +73,9 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
   const [isBannerLoading, setIsBannerLoading] = useState<boolean>(false);
   const [bannerError, setBannerError] = useState<boolean>(false);
   const [bannerCached, setBannerCached] = useState<boolean>(false);
+
+  // Postcard View State - show postcard format for "card" generation mode
+  const [showPostcardView, setShowPostcardView] = useState<boolean>(false);
 
   // Navigation State
   const [isTocOpen, setIsTocOpen] = useState<boolean>(false);
@@ -242,6 +246,20 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
       setBannerCached(true);
     }
   }, [fullCardContent]);
+
+  /**
+   * Detect if this is a "card" mode hyperblog and enable postcard view by default
+   */
+  useEffect(() => {
+    if (fullCardContent?.blog_content?.metadata?.generation_mode === "card") {
+      setShowPostcardView(true);
+    }
+  }, [fullCardContent]);
+
+  /**
+   * Check if this is a card-mode hyperblog
+   */
+  const isCardMode = fullCardContent?.blog_content?.metadata?.generation_mode === "card";
 
   /**
    * Handle View Increment
@@ -589,8 +607,41 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
         )}
       </div>
 
-      {/* Banner Image Section */}
-      {!isLoadingFullContent && (fullCardContent?.image_prompt || bannerUrl) && (
+      {/* View Toggle for Card Mode */}
+      {!isLoadingFullContent && isCardMode && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="flex justify-center gap-2 mb-4">
+            <button
+              className={`btn btn-sm gap-2 ${showPostcardView ? "btn-primary" : "btn-outline"}`}
+              onClick={() => setShowPostcardView(true)}
+            >
+              📮 Postcard View
+            </button>
+            <button
+              className={`btn btn-sm gap-2 ${!showPostcardView ? "btn-primary" : "btn-outline"}`}
+              onClick={() => setShowPostcardView(false)}
+            >
+              📄 Full Content
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Postcard View for Card Mode */}
+      {!isLoadingFullContent && showPostcardView && isCardMode && fullCardContent && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <ChristmasPostcard
+            blog={fullCardContent}
+            onImageGenerated={(url) => {
+              setBannerUrl(url);
+              setBannerCached(false);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Banner Image Section - Only show when NOT in postcard view */}
+      {!isLoadingFullContent && !showPostcardView && (fullCardContent?.image_prompt || bannerUrl) && (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           {/* Banner Loading State */}
           {isBannerLoading && (
@@ -679,7 +730,8 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
         </div>
       )}
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Hidden when in postcard view for card mode */}
+      {!(showPostcardView && isCardMode) && (
       <div className="flex-1 flex flex-col lg:flex-row relative max-w-full">
         {/* Table of Contents Sidebar */}
         {currentCard.blog_content?.sections && (
@@ -1007,6 +1059,7 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
           )}
         </div>
       </div>
+      )}
 
       {/* Footer Metadata */}
       {!isLoadingFullContent && (
