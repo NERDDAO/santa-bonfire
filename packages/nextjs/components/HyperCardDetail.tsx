@@ -205,7 +205,7 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
     setBannerError(false);
 
     try {
-      const response = await fetch(`/api/hyperblogs/${blog.id}/banner`, {
+      const response = await fetch(`/api/hypercards/${blog.id}/image`, {
         method: "POST",
       });
 

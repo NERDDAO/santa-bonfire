@@ -226,7 +226,8 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
         dataroom_id: dataroomId,
         user_query: userQuery.trim(),
         is_public: isPublic,
-        blog_length: "medium", // Fixed for cards
+        blog_length: "short", // Cards use short length (single node, 300-500 words)
+        generation_mode: "card", // Use card HTN for single-node generation
       };
 
       // Call purchase API

@@ -1,15 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { HyperCardCreator } from "@/components/HyperCardCreator";
 import { HyperCardFeed } from "@/components/HyperCardFeed";
 import { WhatIsHyperCardsModal } from "@/components/WhatIsHyperCardsModal";
+import { config } from "@/lib/config";
 import type { NextPage } from "next";
 import { ClockIcon, CurrencyDollarIcon, SparklesIcon } from "@heroicons/react/24/outline";
 
 const Home: NextPage = () => {
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [dataroomDetails, setDataroomDetails] = useState<{ description?: string; price?: number }>({});
+  const router = useRouter();
+
+  const handleMakeCard = useCallback(async () => {
+    setIsCreatorOpen(true);
+    try {
+      const response = await fetch(`/api/datarooms/${config.defaultDataroom}`);
+      if (response.ok) {
+        const data = await response.json();
+        setDataroomDetails({
+          description: data.description,
+          price: data.current_hyperblog_price_usd ? parseFloat(data.current_hyperblog_price_usd) : data.price_usd,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch dataroom details:", err);
+    }
+  }, []);
+
+  const handleCardSuccess = useCallback(
+    (hypercardId: string) => {
+      setIsCreatorOpen(false);
+      router.push(`/hypercards/${hypercardId}`);
+    },
+    [router],
+  );
 
   useEffect(() => {
     const hasSeenInfo = localStorage.getItem("hasSeenSantaBonfireInfo");
@@ -43,12 +73,15 @@ const Home: NextPage = () => {
               </p>
             </div>
 
-            <div className="flex justify-center items-center">
+            <div className="flex flex-col justify-center items-center gap-3">
+              <button className="btn btn-primary btn-lg transition-all duration-300 px-8" onClick={handleMakeCard}>
+                🎁 Make a Card Now
+              </button>
               <button
                 className="btn btn-ghost btn-sm text-base-content/60 hover:text-christmas-red hover:bg-transparent"
                 onClick={() => setIsInfoModalOpen(true)}
               >
-                🎁 What are Christmas Cards?
+                What are Christmas Cards?
               </button>
             </div>
           </div>
@@ -167,6 +200,15 @@ const Home: NextPage = () => {
       </div>
 
       <WhatIsHyperCardsModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
+
+      <HyperCardCreator
+        isOpen={isCreatorOpen}
+        onClose={() => setIsCreatorOpen(false)}
+        dataroomId={config.defaultDataroom}
+        dataroomDescription={dataroomDetails.description}
+        dataroomPrice={dataroomDetails.price}
+        onSuccess={handleCardSuccess}
+      />
     </>
   );
 };
