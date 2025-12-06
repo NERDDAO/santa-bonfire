@@ -100,3 +100,5 @@ export function encodePaymentHeader(
   return btoa(JSON.stringify(payload));
 }
 
+
+

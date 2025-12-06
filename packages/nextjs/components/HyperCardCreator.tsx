@@ -45,6 +45,9 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
   const [wordCount, setWordCount] = useState<number | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
+  // Price loading state
+  const [isPriceLoading, setIsPriceLoading] = useState(false);
+
   // HTN Progress state
   const [htnProgress, setHtnProgress] = useState<HyperBlogHTNProgress | null>(null);
   const [showProgressModal, setShowProgressModal] = useState(false);
@@ -63,6 +66,7 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
       setUserQuery("");
       setIsPublic(true);
       setIsLoading(false);
+      setIsPriceLoading(false);
       setError(null);
       setHypercardId(null);
       setGenerationStatus("idle");
@@ -92,6 +96,13 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
       textareaRef.current.focus();
     }
   }, [isOpen, isConnected]);
+
+  // Effect: Clear price loading state when dataroomPrice prop changes
+  useEffect(() => {
+    if (dataroomPrice !== undefined) {
+      setIsPriceLoading(false);
+    }
+  }, [dataroomPrice]);
 
   // Validation helper
   const isQueryValid = userQuery.trim().length >= 3 && userQuery.length <= 500;
@@ -193,20 +204,25 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
       // Calculate payment amount
       let priceUsd: number;
 
-      if (dataroomPrice !== undefined && dataroomPrice > 0) {
-        priceUsd = dataroomPrice;
-      } else {
-        // Fetch dataroom details to get current price
-        const dataroomResponse = await fetch(`/api/datarooms/${dataroomId}`);
-        if (!dataroomResponse.ok) {
-          throw new Error("Failed to fetch bonfire details");
+      setIsPriceLoading(true);
+      try {
+        if (dataroomPrice !== undefined && dataroomPrice > 0) {
+          priceUsd = dataroomPrice;
+        } else {
+          // Fetch dataroom details to get current price
+          const dataroomResponse = await fetch(`/api/datarooms/${dataroomId}`);
+          if (!dataroomResponse.ok) {
+            throw new Error("Failed to fetch bonfire details");
+          }
+          const dataroomData = await dataroomResponse.json();
+          // Use current_hyperblog_price_usd if > 0, otherwise fall back to price_usd
+          const dynamicPrice = dataroomData.current_hyperblog_price_usd
+            ? parseFloat(dataroomData.current_hyperblog_price_usd)
+            : 0;
+          priceUsd = dynamicPrice > 0 ? dynamicPrice : dataroomData.price_usd;
         }
-        const dataroomData = await dataroomResponse.json();
-        // Use current_hyperblog_price_usd if > 0, otherwise fall back to price_usd
-        const dynamicPrice = dataroomData.current_hyperblog_price_usd
-          ? parseFloat(dataroomData.current_hyperblog_price_usd)
-          : 0;
-        priceUsd = dynamicPrice > 0 ? dynamicPrice : dataroomData.price_usd;
+      } finally {
+        setIsPriceLoading(false);
       }
 
       // Set amount as decimal string (buildAndSignPaymentHeader handles conversion)
@@ -367,7 +383,16 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
                       : dataroomDescription}
                   </div>
                   {dataroomPrice !== undefined && (
-                    <div className="mt-2 text-sm font-bold">${dataroomPrice.toFixed(2)} USD</div>
+                    <div className="mt-2 text-sm font-bold">
+                      {isPriceLoading ? (
+                        <span className="flex items-center gap-2">
+                          <span className="loading loading-spinner loading-xs"></span>
+                          Calculating price...
+                        </span>
+                      ) : (
+                        `$${dataroomPrice.toFixed(2)} USD`
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
