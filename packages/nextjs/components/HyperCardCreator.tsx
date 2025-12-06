@@ -206,21 +206,18 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
 
       setIsPriceLoading(true);
       try {
-        if (dataroomPrice !== undefined && dataroomPrice > 0) {
-          priceUsd = dataroomPrice;
-        } else {
-          // Fetch dataroom details to get current price
-          const dataroomResponse = await fetch(`/api/datarooms/${dataroomId}`);
-          if (!dataroomResponse.ok) {
-            throw new Error("Failed to fetch bonfire details");
-          }
-          const dataroomData = await dataroomResponse.json();
-          // Use current_hyperblog_price_usd if > 0, otherwise fall back to price_usd
-          const dynamicPrice = dataroomData.current_hyperblog_price_usd
-            ? parseFloat(dataroomData.current_hyperblog_price_usd)
-            : 0;
-          priceUsd = dynamicPrice > 0 ? dynamicPrice : dataroomData.price_usd;
+        // Always fetch current dynamic price from backend to get minimum floor enforcement
+        // The dataroomPrice prop may be stale or not include minimum floor calculation
+        const dataroomResponse = await fetch(`/api/datarooms/${dataroomId}`);
+        if (!dataroomResponse.ok) {
+          throw new Error("Failed to fetch bonfire details");
         }
+        const dataroomData = await dataroomResponse.json();
+        // Use current_hyperblog_price_usd which includes minimum floor enforcement
+        const dynamicPrice = dataroomData.current_hyperblog_price_usd
+          ? parseFloat(dataroomData.current_hyperblog_price_usd)
+          : 0;
+        priceUsd = dynamicPrice > 0 ? dynamicPrice : dataroomData.price_usd;
       } finally {
         setIsPriceLoading(false);
       }
@@ -244,6 +241,7 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
         is_public: isPublic,
         blog_length: "short", // Cards use short length (single node, 300-500 words)
         generation_mode: "card", // Use card HTN for single-node generation
+        expected_amount: amount, // Pass signed amount to ensure backend uses same price
       };
 
       // Call purchase API
