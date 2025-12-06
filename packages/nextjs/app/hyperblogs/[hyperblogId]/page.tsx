@@ -1,113 +1,89 @@
-"use client";
-
-import React, { useCallback, useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { HyperCardDetail } from "@/components/HyperCardDetail";
+import type { Metadata } from "next";
 import type { HyperBlogInfo } from "@/lib/types/delve-api";
-import { AlertCircle } from "lucide-react";
+import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
+import HyperCardDetailClient from "./HyperCardDetailClient";
 
-export default function HyperCardDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const hypercardId = params.hyperblogId as string;
+const FALLBACK_TITLE = "Santa Bonfire - AI-Generated Christmas Card";
+const FALLBACK_DESCRIPTION = "Create AI-generated Christmas cards from Santa's knowledge graph";
+const FALLBACK_IMAGE = "/thumbnail.jpg";
+const API_TIMEOUT_MS = 10000;
 
-  // State
-  const [card, setCard] = useState<HyperBlogInfo | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+// Construct base URL for internal API routes (same logic as getMetadata)
+const getBaseUrl = () =>
+  process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : `http://localhost:${process.env.PORT || 3000}`;
 
-  // Fetch card details
-  const fetchCard = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/hyperblogs/${hypercardId}`);
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ hyperblogId: string }>;
+}): Promise<Metadata> {
+  const { hyperblogId } = await params;
+
+  try {
+    // Fetch from internal API route to centralize backend proxying logic
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api/hyperblogs/${hyperblogId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    });
+
+    if (!response.ok) {
+      return getMetadata({
+        title: FALLBACK_TITLE,
+        description: FALLBACK_DESCRIPTION,
+        imageRelativePath: FALLBACK_IMAGE,
+      });
+    }
+
+    const card: HyperBlogInfo = await response.json();
+
+    const title = card.user_query || FALLBACK_TITLE;
+    const description = card.summary || card.preview || FALLBACK_DESCRIPTION;
+
+    // Handle image URL - could be absolute or relative
+    let imageRelativePath = FALLBACK_IMAGE;
+    if (card.banner_url) {
+      if (card.banner_url.startsWith("http://") || card.banner_url.startsWith("https://")) {
+        // For absolute URLs, preserve the base metadata and only override images
+        const baseMetadata = getMetadata({
+          title,
+          description,
+          imageRelativePath: FALLBACK_IMAGE,
+        });
+        return {
+          ...baseMetadata,
+          openGraph: {
+            ...baseMetadata.openGraph,
+            images: [{ url: card.banner_url }],
+          },
+          twitter: {
+            ...baseMetadata.twitter,
+            images: [card.banner_url],
+          },
+        };
       }
-      const data: HyperBlogInfo = await response.json();
-      setCard(data);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch card";
-      setError(errorMessage);
-      console.error("Error fetching card:", err);
-    } finally {
-      setIsLoading(false);
+      imageRelativePath = card.banner_url;
     }
-  }, [hypercardId]);
 
-  useEffect(() => {
-    if (hypercardId) {
-      fetchCard();
-    }
-  }, [hypercardId, fetchCard]);
-
-  // Handlers
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/");
-    }
-  };
-
-  // Loading State
-  if (isLoading) {
-    return (
-      <div className="container mx-auto max-w-5xl px-4 py-8">
-        <div className="space-y-6">
-          {/* Header Skeleton */}
-          <div className="flex justify-between items-start">
-            <div className="space-y-2 w-2/3">
-              <div className="skeleton h-8 w-3/4"></div>
-              <div className="flex gap-2">
-                <div className="skeleton h-5 w-20"></div>
-                <div className="skeleton h-5 w-20"></div>
-              </div>
-            </div>
-            <div className="skeleton h-8 w-8 rounded-full"></div>
-          </div>
-
-          {/* Content Skeleton */}
-          <div className="space-y-4 mt-8">
-            <div className="skeleton h-6 w-1/2"></div>
-            <div className="skeleton h-32 w-full"></div>
-            <div className="skeleton h-32 w-full"></div>
-            <div className="skeleton h-6 w-1/3 mt-8"></div>
-            <div className="skeleton h-32 w-full"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return getMetadata({
+      title,
+      description,
+      imageRelativePath,
+    });
+  } catch {
+    return getMetadata({
+      title: FALLBACK_TITLE,
+      description: FALLBACK_DESCRIPTION,
+      imageRelativePath: FALLBACK_IMAGE,
+    });
   }
-
-  // Error State
-  if (error || !card) {
-    return (
-      <div className="container mx-auto px-4 py-12 max-w-xl text-center">
-        <div className="alert alert-error shadow-lg mb-6 flex flex-col items-center gap-4">
-          <AlertCircle className="w-12 h-12" />
-          <div>
-            <h3 className="font-bold text-lg">Error loading card</h3>
-            <div className="text-sm opacity-80">{error || "Card not found"}</div>
-          </div>
-          <div className="flex gap-2 w-full justify-center">
-            <button onClick={fetchCard} className="btn btn-sm btn-outline btn-error">
-              Retry
-            </button>
-            <button onClick={handleBack} className="btn btn-sm btn-ghost">
-              Go Back
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Main Content
-  const hash = typeof window !== "undefined" ? window.location.hash.replace("#", "") : undefined;
-
-  return <HyperCardDetail blog={card} onBack={handleBack} showBackButton={true} initialSectionId={hash || null} />;
 }
 
+export default function HyperCardDetailPage() {
+  return <HyperCardDetailClient />;
+}
