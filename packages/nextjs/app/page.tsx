@@ -89,7 +89,7 @@ const Home: NextPage = () => {
           {/* Latest Cards Section */}
           <div className="max-w-6xl mx-auto mb-20 w-full space-y-8">
             <div className="p-1 bg-transparent">
-              <HyperCardFeed showFilters={true} title="" autoRefreshInterval={60000} initialLimit={6} />
+              <HyperCardFeed showFilters={true} title="" autoRefreshInterval={60000} initialLimit={6} displayMode="gallery" />
             </div>
 
             <div className="text-center mt-12">
