@@ -15,6 +15,7 @@ interface HyperCardFeedProps {
   autoRefreshInterval?: number; // Optional: Auto-refresh interval in ms (default 30000)
   initialLimit?: number; // Optional: Initial number of cards to load (default 10)
   className?: string; // Optional: Additional CSS classes
+  displayMode?: "list" | "gallery"; // Optional: Display mode (default: "list")
 }
 
 /**
@@ -32,6 +33,7 @@ export const HyperCardFeed = ({
   autoRefreshInterval = 30000,
   initialLimit = 10,
   className = "",
+  displayMode = "list",
 }: HyperCardFeedProps) => {
   // Data State
   const [cards, setCards] = useState<HyperBlogInfo[]>([]);
@@ -515,117 +517,187 @@ export const HyperCardFeed = ({
 
       {/* Card List */}
       {cards.length > 0 && (
-        <div className="space-y-4">
-          {cards.map(card => (
-            <Link
-              key={card.id}
-              href={`/hyperblogs/${card.id}`}
-              passHref
-              className="block no-underline group animate-slide-up"
-            >
-              <div
-                className="card-minimal group-hover:translate-y-[-2px] christmas-card-hover"
-                role="button"
-                tabIndex={0}
-                aria-label={`Christmas card: ${card.user_query}`}
+        <div
+          className={
+            displayMode === "gallery"
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              : "space-y-4"
+          }
+        >
+          {cards.map(card =>
+            displayMode === "gallery" ? (
+              /* Gallery Mode Card */
+              <Link
+                key={card.id}
+                href={`/hyperblogs/${card.id}`}
+                passHref
+                className="block no-underline group animate-slide-up"
               >
-                <div className="relative w-full">
-                  {/* Status Badge */}
-                  <div className="absolute top-0 right-0">{getStatusBadge(card.generation_status)}</div>
-
-                  {/* Title */}
-                  <h4 className="text-xl sm:text-2xl font-bold font-serif mb-3 pr-24 line-clamp-2 text-base-content group-hover:text-christmas-red transition-colors">
-                    🎁 {card.user_query}
-                  </h4>
-
-                  {/* Preview Text - prefer summary over truncated preview */}
-                  <div className="relative mb-6">
-                    <p className="text-base text-base-content/80 leading-relaxed line-clamp-4">
-                      {card.summary || truncatePreviewSmart(card.preview, 280)}
-                    </p>
-                  </div>
-
-                  {/* Metadata Row */}
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-base-content/60">
-                    {/* Bonfire badge (only in aggregated mode) */}
-                    {!dataroomId && (
-                      <>
-                        <span className="badge badge-outline badge-sm">
-                          🔥 {card.dataroom_id.substring(0, 8)}...
+                <div
+                  className="gallery-card group"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Christmas card: ${card.user_query}`}
+                >
+                  {/* Image Section */}
+                  <div className="gallery-card-image">
+                    {card.banner_url ? (
+                      <img
+                        src={card.banner_url}
+                        alt={card.user_query}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="gallery-card-placeholder">
+                        <span className="text-5xl mb-2">
+                          {card.generation_status === "generating"
+                            ? "🎄"
+                            : card.generation_status === "completed"
+                              ? "🎁"
+                              : "❄️"}
                         </span>
-                        <span>•</span>
-                      </>
+                        <span className="text-sm text-base-content/60 px-4 text-center line-clamp-2">
+                          {card.user_query.substring(0, 50)}
+                          {card.user_query.length > 50 ? "..." : ""}
+                        </span>
+                      </div>
                     )}
-                    <span className="font-medium text-base-content/80">
-                      by {truncateAddress(card.author_wallet, 6)}
-                    </span>
-                    <span>•</span>
-                    <span>{formatTimestamp(card.created_at)}</span>
-                    {card.generation_status === "completed" && card.word_count && (
-                      <>
-                        <span>•</span>
-                        <span>{card.word_count} words</span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {calculateReadingTime(card.word_count)}
-                        </span>
-                      </>
+                    {/* Status Badge Overlay */}
+                    {card.generation_status !== "completed" && (
+                      <div className="absolute top-2 right-2">{getStatusBadge(card.generation_status)}</div>
                     )}
                   </div>
 
-                  {/* Taxonomy Keywords Badges */}
-                  {card.taxonomy_keywords && card.taxonomy_keywords.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3" aria-label="Keywords">
-                      <span className="text-xs opacity-60 mr-1">🏷️</span>
-                      {card.taxonomy_keywords.slice(0, 5).map((keyword, idx) => (
-                        <span key={idx} className="badge badge-primary badge-sm">
-                          {keyword}
-                        </span>
-                      ))}
-                      {card.taxonomy_keywords.length > 5 && (
-                        <span className="badge badge-ghost badge-sm">+{card.taxonomy_keywords.length - 5} more</span>
+                  {/* Metadata Section */}
+                  <div className="gallery-card-content">
+                    <h4 className="text-lg font-bold font-serif line-clamp-2 text-base-content group-hover:text-christmas-red transition-colors">
+                      🎁 {card.user_query}
+                    </h4>
+                    <div className="flex items-center gap-2 text-sm text-base-content/60">
+                      <span className="font-medium">by {truncateAddress(card.author_wallet, 4)}</span>
+                      <span>•</span>
+                      <span>
+                        {new Date(card.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              /* List Mode Card (Original) */
+              <Link
+                key={card.id}
+                href={`/hyperblogs/${card.id}`}
+                passHref
+                className="block no-underline group animate-slide-up"
+              >
+                <div
+                  className="card-minimal group-hover:translate-y-[-2px] christmas-card-hover"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Christmas card: ${card.user_query}`}
+                >
+                  <div className="relative w-full">
+                    {/* Status Badge */}
+                    <div className="absolute top-0 right-0">{getStatusBadge(card.generation_status)}</div>
+
+                    {/* Title */}
+                    <h4 className="text-xl sm:text-2xl font-bold font-serif mb-3 pr-24 line-clamp-2 text-base-content group-hover:text-christmas-red transition-colors">
+                      🎁 {card.user_query}
+                    </h4>
+
+                    {/* Preview Text - prefer summary over truncated preview */}
+                    <div className="relative mb-6">
+                      <p className="text-base text-base-content/80 leading-relaxed line-clamp-4">
+                        {card.summary || truncatePreviewSmart(card.preview, 280)}
+                      </p>
+                    </div>
+
+                    {/* Metadata Row */}
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-base-content/60">
+                      {/* Bonfire badge (only in aggregated mode) */}
+                      {!dataroomId && (
+                        <>
+                          <span className="badge badge-outline badge-sm">
+                            🔥 {card.dataroom_id.substring(0, 8)}...
+                          </span>
+                          <span>•</span>
+                        </>
+                      )}
+                      <span className="font-medium text-base-content/80">
+                        by {truncateAddress(card.author_wallet, 6)}
+                      </span>
+                      <span>•</span>
+                      <span>{formatTimestamp(card.created_at)}</span>
+                      {card.generation_status === "completed" && card.word_count && (
+                        <>
+                          <span>•</span>
+                          <span>{card.word_count} words</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {calculateReadingTime(card.word_count)}
+                          </span>
+                        </>
                       )}
                     </div>
-                  )}
 
-                  {/* Interaction Row Preview (Non-interactive in card, just visual) */}
-                  {card.generation_status === "completed" && (
-                    <div className="flex items-center gap-6 mt-6 pt-4 border-t border-base-content/5 text-base-content/60">
-                      <div className="flex items-center gap-1.5 text-xs sm:text-sm hover:text-primary transition-colors">
-                        <ThumbsUp className="w-4 h-4" />
-                        <span>{card.upvotes || 0}</span>
+                    {/* Taxonomy Keywords Badges */}
+                    {card.taxonomy_keywords && card.taxonomy_keywords.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3" aria-label="Keywords">
+                        <span className="text-xs opacity-60 mr-1">🏷️</span>
+                        {card.taxonomy_keywords.slice(0, 5).map((keyword, idx) => (
+                          <span key={idx} className="badge badge-primary badge-sm">
+                            {keyword}
+                          </span>
+                        ))}
+                        {card.taxonomy_keywords.length > 5 && (
+                          <span className="badge badge-ghost badge-sm">+{card.taxonomy_keywords.length - 5} more</span>
+                        )}
                       </div>
+                    )}
 
-                      <div className="flex items-center gap-1.5 text-xs sm:text-sm hover:text-primary transition-colors">
-                        <ThumbsDown className="w-4 h-4" />
-                        <span>{card.downvotes || 0}</span>
+                    {/* Interaction Row Preview (Non-interactive in card, just visual) */}
+                    {card.generation_status === "completed" && (
+                      <div className="flex items-center gap-6 mt-6 pt-4 border-t border-base-content/5 text-base-content/60">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm hover:text-primary transition-colors">
+                          <ThumbsUp className="w-4 h-4" />
+                          <span>{card.upvotes || 0}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm hover:text-primary transition-colors">
+                          <ThumbsDown className="w-4 h-4" />
+                          <span>{card.downvotes || 0}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm hover:text-primary transition-colors">
+                          <MessageCircle className="w-4 h-4" />
+                          <span>{card.comment_count || 0}</span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm px-2 ml-auto">
+                          <Eye className="w-4 h-4 opacity-70" />
+                          <span>{card.view_count || 0}</span>
+                        </div>
+
+                        <button
+                          className="btn btn-ghost btn-xs gap-1 z-10 relative hover:bg-base-200 ml-2"
+                          onClick={e => handleOpenCard(card, e)}
+                          aria-label="Preview Card"
+                        >
+                          <Maximize2 className="w-3 h-3" />
+                          <span className="hidden sm:inline">Preview</span>
+                        </button>
                       </div>
-
-                      <div className="flex items-center gap-1.5 text-xs sm:text-sm hover:text-primary transition-colors">
-                        <MessageCircle className="w-4 h-4" />
-                        <span>{card.comment_count || 0}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-xs sm:text-sm px-2 ml-auto">
-                        <Eye className="w-4 h-4 opacity-70" />
-                        <span>{card.view_count || 0}</span>
-                      </div>
-
-                      <button
-                        className="btn btn-ghost btn-xs gap-1 z-10 relative hover:bg-base-200 ml-2"
-                        onClick={e => handleOpenCard(card, e)}
-                        aria-label="Preview Card"
-                      >
-                        <Maximize2 className="w-3 h-3" />
-                        <span className="hidden sm:inline">Preview</span>
-                      </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ),
+          )}
         </div>
       )}
 

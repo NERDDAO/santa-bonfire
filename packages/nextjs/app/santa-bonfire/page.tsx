@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { PaidChatInterface } from "@/components/PaidChatInterface";
+import { HyperCardFeed } from "@/components/HyperCardFeed";
 import { config } from "@/lib/config";
 import type { NextPage } from "next";
 import { ArrowLeftIcon, GiftIcon, SparklesIcon } from "@heroicons/react/24/outline";
@@ -138,21 +138,21 @@ function SantaBonfireContent() {
             <span className="text-xl">✨</span>
             <p className="text-base-content/80">
               <span className="font-semibold">Welcome to Santa&apos;s Workshop!</span>{" "}
-              Share your holiday memories and help create magical Christmas cards for everyone.
+              Browse magical Christmas cards created by the community.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Chat Interface */}
-      <div className="flex-1">
-        <PaidChatInterface
-          agentId={santaAgentId}
+      {/* Gallery Feed */}
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-6 w-full">
+        <HyperCardFeed
           dataroomId={santaDataroomId}
-          dataroomDescription="Santa's Workshop - Contribute to Christmas card creation"
-          initialGraphMode="dynamic"
-          selectedMicrosubTxHash={microsubTxHash || undefined}
-          className="h-full"
+          displayMode="gallery"
+          title="Santa's Christmas Cards"
+          autoRefreshInterval={30000}
+          initialLimit={12}
+          className="w-full"
         />
       </div>
 
