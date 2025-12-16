@@ -69,7 +69,8 @@ const Home: NextPage = () => {
                 Santa Bonfire
               </h1>
               <p className="block text-xl mt-4 text-base-content/70 leading-relaxed max-w-2xl mx-auto">
-                Transform Santa&apos;s knowledge graph into magical, AI-generated Christmas cards with blockchain-verified payments ❄️
+                Transform Santa&apos;s knowledge graph into magical, AI-generated Christmas cards with
+                blockchain-verified payments ❄️
               </p>
             </div>
 
@@ -89,7 +90,13 @@ const Home: NextPage = () => {
           {/* Latest Cards Section */}
           <div className="max-w-6xl mx-auto mb-20 w-full space-y-8">
             <div className="p-1 bg-transparent">
-              <HyperCardFeed showFilters={true} title="" autoRefreshInterval={60000} initialLimit={6} displayMode="gallery" />
+              <HyperCardFeed
+                showFilters={true}
+                title=""
+                autoRefreshInterval={60000}
+                initialLimit={6}
+                displayMode="gallery"
+              />
             </div>
 
             <div className="text-center mt-12">
@@ -103,7 +110,8 @@ const Home: NextPage = () => {
           <div className="bg-base-200/50 p-8 sm:p-10 rounded-2xl mb-20 w-full border border-base-content/5 text-center christmas-card-bg">
             <h2 className="text-2xl font-bold mb-3 font-serif">🎄 New to Santa Bonfire?</h2>
             <p className="text-base-content/70 mb-6">
-              Learn how Santa&apos;s knowledge graph transforms into magical, AI-generated Christmas cards with blockchain payments.
+              Learn how Santa&apos;s knowledge graph transforms into magical, AI-generated Christmas cards with
+              blockchain payments.
             </p>
             <Link href="/how-it-works" className="btn btn-outline btn-primary transition-all duration-300">
               Learn How It Works →
@@ -121,7 +129,8 @@ const Home: NextPage = () => {
                 </div>
                 <h3 className="text-xl font-bold font-serif">✨ Magical Card Creation</h3>
                 <p className="text-base-content/70 leading-relaxed">
-                  Advanced AI generates unique, heartfelt Christmas cards from Santa&apos;s knowledge graph using hierarchical task networks.
+                  Advanced AI generates unique, heartfelt Christmas cards from Santa&apos;s knowledge graph using
+                  hierarchical task networks.
                 </p>
                 <div className="badge badge-outline badge-primary mt-2">Unique & Personal</div>
               </div>
@@ -134,7 +143,8 @@ const Home: NextPage = () => {
                 </div>
                 <h3 className="text-xl font-bold font-serif">💳 Payment-Gated Access</h3>
                 <p className="text-base-content/70 leading-relaxed">
-                  Secure x402 protocol payments unlock access to Santa&apos;s Writer's Rooms with blockchain verification and on-chain transaction tracking.
+                  Secure x402 protocol payments unlock access to Santa&apos;s Writer&apos;s Rooms with blockchain
+                  verification and on-chain transaction tracking.
                 </p>
                 <div className="badge badge-outline badge-secondary mt-2">Verified On-Chain</div>
               </div>
@@ -147,7 +157,8 @@ const Home: NextPage = () => {
                 </div>
                 <h3 className="text-xl font-bold font-serif">⚡ Instant Magic</h3>
                 <p className="text-base-content/70 leading-relaxed">
-                  Card creation happens in the background. Track the magic in real-time with instant notifications when your card is ready.
+                  Card creation happens in the background. Track the magic in real-time with instant notifications when
+                  your card is ready.
                 </p>
                 <div className="badge badge-outline badge-accent mt-2">30-60 seconds</div>
               </div>
@@ -158,7 +169,7 @@ const Home: NextPage = () => {
           <div className="max-w-4xl mx-auto mt-24 mb-12 text-center space-y-6">
             <h2 className="text-4xl font-bold font-serif">🎁 Ready to Create Your Card?</h2>
             <p className="text-xl text-base-content/70 mb-8">
-              Explore Santa&apos;s Writer's Rooms and create your first magical Christmas card
+              Explore Santa&apos;s Writer&apos;s Rooms and create your first magical Christmas card
             </p>
             <Link href="/data-rooms" className="btn btn-primary btn-lg px-10 transition-all duration-300">
               🎄 Create Christmas Card
@@ -214,4 +225,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-
