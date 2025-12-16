@@ -95,7 +95,7 @@ export default function DataRoomsPage() {
       }
 
       const createdDataRoom: DataRoomInfo = await response.json();
-      notification.success(`🎄 Writer's Room created successfully! ID: ${createdDataRoom.id}`);
+      notification.success(`🎄 Writer&apos;s Room created successfully! ID: ${createdDataRoom.id}`);
 
       // Refetch data rooms
       await fetchDataRooms();
@@ -103,13 +103,35 @@ export default function DataRoomsPage() {
       // Close wizard
       setIsWizardOpen(false);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create Writer's Room";
+      const errorMessage = err instanceof Error ? err.message : "Failed to create Writer&apos;s Room";
       notification.error(errorMessage);
-      console.error("Error creating Writer's Room:", err);
+      console.error("Error creating Writer&apos;s Room:", err);
     } finally {
       setIsCreating(false);
     }
   };
+
+  // Extract unique bonfires for filter dropdown - MUST be before conditional returns
+  const uniqueBonfires = React.useMemo(() => {
+    const bonfireMap = new Map<string, { id: string; name: string }>();
+    dataRooms.forEach(room => {
+      if (room.bonfire_id && !bonfireMap.has(room.bonfire_id)) {
+        bonfireMap.set(room.bonfire_id, {
+          id: room.bonfire_id,
+          name: room.bonfire_name || truncateAddress(room.bonfire_id, 8),
+        });
+      }
+    });
+    return Array.from(bonfireMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [dataRooms]);
+
+  // Filter datarooms based on selected bonfire - MUST be before conditional returns
+  const filteredDataRooms = React.useMemo(() => {
+    if (selectedBonfireFilter === "all") {
+      return dataRooms;
+    }
+    return dataRooms.filter(room => room.bonfire_id === selectedBonfireFilter);
+  }, [dataRooms, selectedBonfireFilter]);
 
   // Loading state
   if (loading) {
@@ -119,12 +141,12 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer&apos;s Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
             {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
-            Create Writer's Room
+            Create Writer&apos;s Room
           </button>
         </div>
 
@@ -147,12 +169,12 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer&apos;s Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
             {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
-            Create Writer's Room
+            Create Writer&apos;s Room
           </button>
         </div>
 
@@ -171,7 +193,7 @@ export default function DataRoomsPage() {
             />
           </svg>
           <div>
-            <h3 className="font-bold">Error loading Writer's Rooms</h3>
+            <h3 className="font-bold">Error loading Writer&apos;s Rooms</h3>
             <div className="text-sm">{error}</div>
           </div>
           <button onClick={fetchDataRooms} className="btn btn-sm btn-ghost">
@@ -192,12 +214,12 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer&apos;s Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
             {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
-            Create Writer's Room
+            Create Writer&apos;s Room
           </button>
         </div>
 
@@ -216,8 +238,8 @@ export default function DataRoomsPage() {
             ></path>
           </svg>
           <div>
-            <h3 className="font-bold">No Writer's Rooms available</h3>
-            <div className="text-sm">No Writer's Rooms available yet. Be the first to create one! ✍️</div>
+            <h3 className="font-bold">No Writer&apos;s Rooms available</h3>
+            <div className="text-sm">No Writer&apos;s Rooms available yet. Be the first to create one! ✍️</div>
           </div>
         </div>
 
@@ -226,29 +248,7 @@ export default function DataRoomsPage() {
     );
   }
 
-  // Extract unique bonfires for filter dropdown
-  const uniqueBonfires = React.useMemo(() => {
-    const bonfireMap = new Map<string, { id: string; name: string }>();
-    dataRooms.forEach(room => {
-      if (room.bonfire_id && !bonfireMap.has(room.bonfire_id)) {
-        bonfireMap.set(room.bonfire_id, {
-          id: room.bonfire_id,
-          name: room.bonfire_name || truncateAddress(room.bonfire_id, 8),
-        });
-      }
-    });
-    return Array.from(bonfireMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, [dataRooms]);
-
-  // Filter datarooms based on selected bonfire
-  const filteredDataRooms = React.useMemo(() => {
-    if (selectedBonfireFilter === "all") {
-      return dataRooms;
-    }
-    return dataRooms.filter(room => room.bonfire_id === selectedBonfireFilter);
-  }, [dataRooms, selectedBonfireFilter]);
-
-  // Writer's Rooms grid
+  // Writer&apos;s Rooms grid
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
@@ -256,10 +256,10 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer&apos;s Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
             <div className="mt-2 text-sm opacity-70">
-              Found {filteredDataRooms.length} Writer's Room{filteredDataRooms.length !== 1 ? "s" : ""} ✍️
+              Found {filteredDataRooms.length} Writer&apos;s Room{filteredDataRooms.length !== 1 ? "s" : ""} ✍️
               {selectedBonfireFilter !== "all" && ` (filtered)`}
             </div>
             {!isConnected && (
@@ -279,7 +279,7 @@ export default function DataRoomsPage() {
                 </svg>
                 <div>
                   <h3 className="font-bold">Connect your wallet</h3>
-                  <div className="text-sm">Connect your wallet to create Writer's Rooms and Christmas cards.</div>
+                  <div className="text-sm">Connect your wallet to create Writer&apos;s Rooms and Christmas cards.</div>
                 </div>
                 <div>
                   <ConnectButton />
@@ -294,7 +294,7 @@ export default function DataRoomsPage() {
             </button>
             <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
               {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
-              Create Writer's Room
+              Create Writer&apos;s Room
             </button>
           </div>
         </div>
@@ -350,8 +350,8 @@ export default function DataRoomsPage() {
             ></path>
           </svg>
           <div>
-            <h3 className="font-bold">No Writer's Rooms found</h3>
-            <div className="text-sm">No Writer's Rooms match the selected filter. Try selecting a different one.</div>
+            <h3 className="font-bold">No Writer&apos;s Rooms found</h3>
+            <div className="text-sm">No Writer&apos;s Rooms match the selected filter. Try selecting a different one.</div>
           </div>
           <button onClick={() => setSelectedBonfireFilter("all")} className="btn btn-sm btn-ghost">
             Clear Filter
