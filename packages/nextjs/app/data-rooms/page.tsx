@@ -18,7 +18,7 @@ export default function DataRoomsPage() {
   const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
-  // Fetch bonfires from marketplace
+  // Fetch Writer's Rooms from marketplace
   const fetchDataRooms = async () => {
     setLoading(true);
     setError(null);
@@ -31,9 +31,9 @@ export default function DataRoomsPage() {
       const data: DataRoomListResponse = await response.json();
       setDataRooms(data.datarooms);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch bonfires";
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch Writer's Rooms";
       setError(errorMessage);
-      console.error("Error fetching bonfires:", err);
+      console.error("Error fetching Writer's Rooms:", err);
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export default function DataRoomsPage() {
   // Wizard handlers
   const handleOpenWizard = () => {
     if (!isConnected) {
-      notification.error("Please connect your wallet to create a bonfire");
+      notification.error("Please connect your wallet to create a Writer's Room");
       return;
     }
     setIsWizardOpen(true);
@@ -93,7 +93,7 @@ export default function DataRoomsPage() {
       }
 
       const createdDataRoom: DataRoomInfo = await response.json();
-      notification.success(`🎄 Bonfire created successfully! ID: ${createdDataRoom.id}`);
+      notification.success(`🎄 Writer's Room created successfully! ID: ${createdDataRoom.id}`);
 
       // Refetch data rooms
       await fetchDataRooms();
@@ -101,9 +101,9 @@ export default function DataRoomsPage() {
       // Close wizard
       setIsWizardOpen(false);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create bonfire";
+      const errorMessage = err instanceof Error ? err.message : "Failed to create Writer's Room";
       notification.error(errorMessage);
-      console.error("Error creating bonfire:", err);
+      console.error("Error creating Writer's Room:", err);
     } finally {
       setIsCreating(false);
     }
@@ -117,12 +117,12 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
-            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
-            Create Bonfire
+            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
+            Create Writer's Room
           </button>
         </div>
 
@@ -145,12 +145,12 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
-            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
-            Create Bonfire
+            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
+            Create Writer's Room
           </button>
         </div>
 
@@ -169,7 +169,7 @@ export default function DataRoomsPage() {
             />
           </svg>
           <div>
-            <h3 className="font-bold">Error loading bonfires</h3>
+            <h3 className="font-bold">Error loading Writer's Rooms</h3>
             <div className="text-sm">{error}</div>
           </div>
           <button onClick={fetchDataRooms} className="btn btn-sm btn-ghost">
@@ -190,12 +190,12 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
           </div>
           <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
-            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
-            Create Bonfire
+            {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
+            Create Writer's Room
           </button>
         </div>
 
@@ -214,8 +214,8 @@ export default function DataRoomsPage() {
             ></path>
           </svg>
           <div>
-            <h3 className="font-bold">No bonfires available</h3>
-            <div className="text-sm">No bonfires available yet. Be the first to light one up! 🔥</div>
+            <h3 className="font-bold">No Writer's Rooms available</h3>
+            <div className="text-sm">No Writer's Rooms available yet. Be the first to create one! ✍️</div>
           </div>
         </div>
 
@@ -224,7 +224,7 @@ export default function DataRoomsPage() {
     );
   }
 
-  // Bonfires grid
+  // Writer's Rooms grid
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
@@ -235,7 +235,7 @@ export default function DataRoomsPage() {
               Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
             <div className="mt-2 text-sm opacity-70">
-              Found {dataRooms.length} bonfire{dataRooms.length !== 1 ? "s" : ""} 🔥
+              Found {dataRooms.length} Writer's Room{dataRooms.length !== 1 ? "s" : ""} ✍️
             </div>
             {!isConnected && (
               <div className="alert alert-info mt-4">
@@ -254,7 +254,7 @@ export default function DataRoomsPage() {
                 </svg>
                 <div>
                   <h3 className="font-bold">Connect your wallet</h3>
-                  <div className="text-sm">Connect your wallet to create bonfires and Christmas cards.</div>
+                  <div className="text-sm">Connect your wallet to create Writer's Rooms and Christmas cards.</div>
                 </div>
                 <div>
                   <ConnectButton />

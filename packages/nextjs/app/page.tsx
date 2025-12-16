@@ -134,7 +134,7 @@ const Home: NextPage = () => {
                 </div>
                 <h3 className="text-xl font-bold font-serif">💳 Payment-Gated Access</h3>
                 <p className="text-base-content/70 leading-relaxed">
-                  Secure x402 protocol payments unlock access to Santa&apos;s Bonfire with blockchain verification and on-chain transaction tracking.
+                  Secure x402 protocol payments unlock access to Santa&apos;s Writer's Rooms with blockchain verification and on-chain transaction tracking.
                 </p>
                 <div className="badge badge-outline badge-secondary mt-2">Verified On-Chain</div>
               </div>
@@ -158,7 +158,7 @@ const Home: NextPage = () => {
           <div className="max-w-4xl mx-auto mt-24 mb-12 text-center space-y-6">
             <h2 className="text-4xl font-bold font-serif">🎁 Ready to Create Your Card?</h2>
             <p className="text-xl text-base-content/70 mb-8">
-              Explore Santa&apos;s bonfires and create your first magical Christmas card
+              Explore Santa&apos;s Writer's Rooms and create your first magical Christmas card
             </p>
             <Link href="/data-rooms" className="btn btn-primary btn-lg px-10 transition-all duration-300">
               🎄 Create Christmas Card

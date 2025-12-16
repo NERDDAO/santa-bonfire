@@ -22,7 +22,7 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
-    label: "Bonfires",
+    label: "Writer's Rooms",
     href: "/data-rooms",
     icon: <FolderIcon className="h-4 w-4" />,
   },

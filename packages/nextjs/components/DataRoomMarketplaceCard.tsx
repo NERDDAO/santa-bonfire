@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HyperCardCreator } from "@/components/HyperCardCreator";
-import { usePaymentHeader } from "@/hooks/usePaymentHeader";
 import type { CenterNodeInfo, DataRoomInfo, DataRoomPreviewResponse } from "@/lib/types/delve-api";
 import { formatTimestamp, truncateAddress, truncateText } from "@/lib/utils";
 import { notification } from "@/utils/scaffold-eth/notification";
@@ -30,13 +29,11 @@ export function DataRoomMarketplaceCard({
 }: DataRoomMarketplaceCardProps) {
   const router = useRouter();
   const { isConnected } = useAccount();
-  const { buildAndSignPaymentHeader } = usePaymentHeader();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
   const [preview, setPreview] = useState<DataRoomPreviewResponse | null>(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [previewError, setPreviewError] = useState<string | null>(null);
-  const [isSubscribing, setIsSubscribing] = useState(false);
   const [isHyperCardModalOpen, setIsHyperCardModalOpen] = useState(false);
   const [centerNodeInfo, setCenterNodeInfo] = useState<CenterNodeInfo | null>(null);
   const [centerNodeLoading, setCenterNodeLoading] = useState(false);
@@ -44,94 +41,6 @@ export function DataRoomMarketplaceCard({
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const centerNodeAbortRef = useRef<AbortController | null>(null);
-
-  const handleSubscribe = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click navigation
-
-    if (!isConnected) {
-      notification.error("Please connect your wallet to subscribe");
-      return;
-    }
-
-    if (isSubscribing) return; // Prevent double-click
-
-    setIsSubscribing(true);
-
-    try {
-      // Use the actual dataroom price in decimal USD format
-      const priceDecimal = dataroom.price_usd.toFixed(2);
-
-      // Build and sign payment header with the correct amount
-      const paymentHeader = await buildAndSignPaymentHeader(priceDecimal);
-
-      if (!paymentHeader) {
-        notification.error("Payment signing cancelled");
-        setIsSubscribing(false);
-        return;
-      }
-
-      // Build request body with dataroom_id, payment_header, and expected_amount
-      const requestBody: Record<string, unknown> = {
-        dataroom_id: dataroom.id,
-        payment_header: paymentHeader,
-        expected_amount: priceDecimal,
-      };
-
-      // Include agent_id only if dataroom has it
-      if (dataroom.agent_id) {
-        requestBody.agent_id = dataroom.agent_id;
-      }
-
-      // Create microsub
-      const response = await fetch("/api/microsubs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        const errorMessage = errorData.error || "Failed to create subscription";
-
-        // Map status codes to user-friendly messages
-        if (response.status === 402) {
-          throw new Error("Payment verification failed. Please try again.");
-        } else if (response.status === 404) {
-          throw new Error("Bonfire not found or no longer available");
-        } else if (response.status === 409) {
-          throw new Error("This Bonfire is no longer active");
-        } else if (response.status === 503) {
-          throw new Error("Request timeout. Please try again.");
-        } else {
-          throw new Error(errorMessage);
-        }
-      }
-
-      const data = await response.json();
-      // Backend returns { microsub: {...}, payment: {...} }
-      const txHash = data.microsub?.tx_hash || data.tx_hash;
-
-      if (!txHash) {
-        throw new Error("No transaction hash returned from subscription");
-      }
-
-      // Store for auto-selection in chat page
-      localStorage.setItem("selectedMicrosubTxHash", txHash);
-
-      notification.success(`🎄 Subscribed successfully! Redirecting to chat...`);
-
-      // Navigate to dataroom-specific chat page
-      router.push(`/chat/${dataroom.id}`);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to subscribe to bonfire";
-      notification.error(errorMessage);
-      console.error("Subscription error:", err);
-    } finally {
-      setIsSubscribing(false);
-    }
-  };
 
   const handleOpenHyperCardModal = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
@@ -297,9 +206,9 @@ export function DataRoomMarketplaceCard({
             <span className="text-2xl mt-0.5">🔥</span>
             <div className="flex-1 min-w-0">
               <h3 className="card-title text-lg leading-tight mb-2">
-                {truncateText(dataroom.description, 100) || "Untitled Bonfire"}
+                {truncateText(dataroom.description, 100) || "Untitled Writer's Room"}
               </h3>
-              {/* Bonfire Badge */}
+              {/* Writer's Room Badge */}
               <span className="badge badge-info badge-sm">
                 {dataroom.bonfire_name || truncateAddress(dataroom.bonfire_id, 6)}
               </span>
@@ -455,37 +364,20 @@ export function DataRoomMarketplaceCard({
           {/* Create Christmas Card Button */}
           {dataroom.is_active ? (
             isConnected ? (
-              <button className="btn btn-secondary btn-sm" onClick={handleOpenHyperCardModal}>
+              <button className="btn btn-primary btn-sm" onClick={handleOpenHyperCardModal}>
                 🎁 Create Card
               </button>
             ) : (
               <div className="tooltip" data-tip="Connect wallet to create card">
-                <button className="btn btn-secondary btn-sm" disabled>
+                <button className="btn btn-primary btn-sm" disabled>
                   🎁 Create Card
                 </button>
               </div>
             )
           ) : (
-            <div className="tooltip" data-tip="Bonfire is inactive">
-              <button className="btn btn-secondary btn-sm" disabled>
-                🎁 Create Card
-              </button>
-            </div>
-          )}
-
-          {/* Subscribe Button */}
-          {dataroom.is_active ? (
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={handleSubscribe}
-              disabled={isSubscribing || !dataroom.is_active}
-            >
-              {isSubscribing ? <span className="loading loading-spinner"></span> : "Subscribe"}
-            </button>
-          ) : (
-            <div className="tooltip" data-tip="This bonfire is no longer active">
+            <div className="tooltip" data-tip="Writer's Room is inactive">
               <button className="btn btn-primary btn-sm" disabled>
-                Subscribe
+                🎁 Create Card
               </button>
             </div>
           )}

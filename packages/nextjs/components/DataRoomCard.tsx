@@ -34,7 +34,7 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
 
   // Get bonfire name
   const getBonfireName = useCallback((): string => {
-    if (!microsub.bonfire_id) return "Unknown Bonfire";
+    if (!microsub.bonfire_id) return "Unknown Writer's Room";
     if (!bonfires) return truncateAddress(microsub.bonfire_id, 6);
     const bonfire = bonfires.find(b => b.id === microsub.bonfire_id);
     return bonfire ? bonfire.name : truncateAddress(microsub.bonfire_id, 6);
@@ -229,7 +229,7 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
               <h3 className="card-title text-xl font-bold font-serif leading-tight mb-2">
                 {truncateText(microsub.description || "Untitled Data Room", 100)}
               </h3>
-              {/* Bonfire Badge */}
+              {/* Writer's Room Badge */}
               <span className="badge badge-info badge-sm">{getBonfireName()}</span>
             </div>
           </div>
