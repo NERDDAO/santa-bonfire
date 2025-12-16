@@ -376,7 +376,6 @@ body::before {
 .dataroom-card:hover {
   border-color: rgba(196, 30, 58, 0.2);
   box-shadow: 0 4px 16px rgba(196, 30, 58, 0.08), 0 2px 8px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
 }
 
 /* Light mode specific enhancements */

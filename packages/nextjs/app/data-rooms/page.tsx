@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { DataRoomMarketplaceCard } from "@/components/DataRoomMarketplaceCard";
 import { DataRoomWizard } from "@/components/DataRoomWizard";
 import type { CreateDataRoomRequest, DataRoomConfig, DataRoomInfo, DataRoomListResponse } from "@/lib/types/delve-api";
+import { truncateAddress } from "@/lib/utils";
 import { notification } from "@/utils/scaffold-eth/notification";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
@@ -17,6 +18,7 @@ export default function DataRoomsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
   const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [selectedBonfireFilter, setSelectedBonfireFilter] = useState<string>("all");
 
   // Fetch Writer's Rooms from marketplace
   const fetchDataRooms = async () => {
@@ -224,6 +226,28 @@ export default function DataRoomsPage() {
     );
   }
 
+  // Extract unique bonfires for filter dropdown
+  const uniqueBonfires = React.useMemo(() => {
+    const bonfireMap = new Map<string, { id: string; name: string }>();
+    dataRooms.forEach(room => {
+      if (room.bonfire_id && !bonfireMap.has(room.bonfire_id)) {
+        bonfireMap.set(room.bonfire_id, {
+          id: room.bonfire_id,
+          name: room.bonfire_name || truncateAddress(room.bonfire_id, 8),
+        });
+      }
+    });
+    return Array.from(bonfireMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [dataRooms]);
+
+  // Filter datarooms based on selected bonfire
+  const filteredDataRooms = React.useMemo(() => {
+    if (selectedBonfireFilter === "all") {
+      return dataRooms;
+    }
+    return dataRooms.filter(room => room.bonfire_id === selectedBonfireFilter);
+  }, [dataRooms, selectedBonfireFilter]);
+
   // Writer's Rooms grid
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -232,10 +256,11 @@ export default function DataRoomsPage() {
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
             <p className="text-base-content/70">
-              Explore magical bonfires and create personalized Christmas cards from Santa&apos;s knowledge graphs.
+              Explore magical Writer's Rooms and create personalized Christmas cards from Santa&apos;s knowledge graphs.
             </p>
             <div className="mt-2 text-sm opacity-70">
-              Found {dataRooms.length} Writer's Room{dataRooms.length !== 1 ? "s" : ""} ✍️
+              Found {filteredDataRooms.length} Writer's Room{filteredDataRooms.length !== 1 ? "s" : ""} ✍️
+              {selectedBonfireFilter !== "all" && ` (filtered)`}
             </div>
             {!isConnected && (
               <div className="alert alert-info mt-4">
@@ -268,18 +293,77 @@ export default function DataRoomsPage() {
               Refresh
             </button>
             <button className="btn btn-primary btn-sm gap-2" onClick={handleOpenWizard} disabled={isCreating}>
-              {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "🔥"}
-              Create Bonfire
+              {isCreating ? <span className="loading loading-spinner loading-xs"></span> : "✍️"}
+              Create Writer's Room
             </button>
           </div>
         </div>
+
+        {/* Filter Dropdown */}
+        {uniqueBonfires.length > 1 && (
+          <div className="mt-6 flex items-center gap-3 flex-wrap">
+            <label htmlFor="bonfire-filter" className="text-sm font-medium text-base-content/70">
+              Filter by bonfire:
+            </label>
+            <select
+              id="bonfire-filter"
+              className="select select-bordered select-sm w-full max-w-xs"
+              value={selectedBonfireFilter}
+              onChange={e => setSelectedBonfireFilter(e.target.value)}
+            >
+              <option value="all">All bonfires ({dataRooms.length} rooms)</option>
+              {uniqueBonfires.map(bonfire => {
+                const count = dataRooms.filter(room => room.bonfire_id === bonfire.id).length;
+                return (
+                  <option key={bonfire.id} value={bonfire.id}>
+                    {bonfire.name} ({count} room{count !== 1 ? "s" : ""})
+                  </option>
+                );
+              })}
+            </select>
+            {selectedBonfireFilter !== "all" && (
+              <button
+                onClick={() => setSelectedBonfireFilter("all")}
+                className="btn btn-ghost btn-sm gap-1"
+                title="Clear filter"
+              >
+                ✕ Clear
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dataRooms.map(dataroom => (
-          <DataRoomMarketplaceCard key={dataroom.id} dataroom={dataroom} onHyperCardCreated={() => fetchDataRooms()} />
-        ))}
-      </div>
+      {filteredDataRooms.length === 0 && selectedBonfireFilter !== "all" ? (
+        <div className="alert alert-info shadow-lg mt-6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <div>
+            <h3 className="font-bold">No Writer's Rooms found</h3>
+            <div className="text-sm">No Writer's Rooms match the selected filter. Try selecting a different one.</div>
+          </div>
+          <button onClick={() => setSelectedBonfireFilter("all")} className="btn btn-sm btn-ghost">
+            Clear Filter
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDataRooms.map(dataroom => (
+            <DataRoomMarketplaceCard key={dataroom.id} dataroom={dataroom} onHyperCardCreated={() => fetchDataRooms()} />
+          ))}
+        </div>
+      )}
 
       <DataRoomWizard isOpen={isWizardOpen} onClose={handleCloseWizard} onComplete={handleWizardComplete} />
     </div>
