@@ -287,10 +287,10 @@ export function DataRoomMarketplaceCard({
 
   return (
     <div
-      className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer christmas-card-hover ${className}`}
+      className={`dataroom-card cursor-pointer ${className}`}
       onClick={handleCardClick}
     >
-      <div className="card-body">
+      <div className="dataroom-card-body">
         {/* Header Section - Description as Title */}
         <div className="flex items-start justify-between mb-2 gap-3">
           <div className="flex items-start gap-2 flex-1 min-w-0">
@@ -339,34 +339,36 @@ export function DataRoomMarketplaceCard({
         )}
 
         {/* Pricing & Limits Section */}
-        <div className="flex flex-wrap gap-2 mb-3 text-xs">
-          <div className="flex items-center gap-1">
-            <span>💰</span>
-            <span className="font-semibold">
-              $
-              {dataroom.current_hyperblog_price_usd && parseFloat(dataroom.current_hyperblog_price_usd) > 0
-                ? dataroom.current_hyperblog_price_usd
-                : dataroom.price_usd.toFixed(2)}{" "}
-              USD
-            </span>
-            {dataroom.dynamic_pricing_enabled && <span className="badge badge-warning badge-xs">Dynamic ▲</span>}
-            {dataroom.dynamic_pricing_enabled && dataroom.total_purchases === 0 && (
-              <span className="badge badge-success badge-xs">No protocol fee! 🎁</span>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            <span>📊</span>
-            <span>{dataroom.query_limit} queries</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span>⏰</span>
-            <span>{dataroom.expiration_days} days</span>
+        <div className="dataroom-section-highlight p-3 mb-3">
+          <div className="flex flex-wrap gap-2 text-xs">
+            <div className="flex items-center gap-1">
+              <span>💰</span>
+              <span className="font-semibold">
+                $
+                {dataroom.current_hyperblog_price_usd && parseFloat(dataroom.current_hyperblog_price_usd) > 0
+                  ? dataroom.current_hyperblog_price_usd
+                  : dataroom.price_usd.toFixed(2)}{" "}
+                USD
+              </span>
+              {dataroom.dynamic_pricing_enabled && <span className="badge badge-warning badge-xs">Dynamic ▲</span>}
+              {dataroom.dynamic_pricing_enabled && dataroom.total_purchases === 0 && (
+                <span className="badge badge-success badge-xs">No protocol fee! 🎁</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <span>📊</span>
+              <span>{dataroom.query_limit} queries</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>⏰</span>
+              <span>{dataroom.expiration_days} days</span>
+            </div>
           </div>
         </div>
 
         {/* Center Node Info Section */}
         {dataroom.center_node_uuid && (
-          <div className="mb-3 bg-base-200/50 border border-base-content/10 rounded-lg p-3">
+          <div className="mb-3 dataroom-section-highlight p-3">
             <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-base-content/70 uppercase tracking-wide">
               <span>🎯</span>
               <span>Focus Node</span>
@@ -449,7 +451,7 @@ export function DataRoomMarketplaceCard({
         <div className="text-xs opacity-70 mb-4">Created {formatTimestamp(dataroom.created_at)}</div>
 
         {/* Card Actions */}
-        <div className="card-actions justify-end flex-wrap gap-2" onClick={e => e.stopPropagation()}>
+        <div className="dataroom-card-actions flex-wrap" onClick={e => e.stopPropagation()}>
           {/* Create Christmas Card Button */}
           {dataroom.is_active ? (
             isConnected ? (

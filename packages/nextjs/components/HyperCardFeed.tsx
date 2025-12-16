@@ -16,6 +16,7 @@ interface HyperCardFeedProps {
   initialLimit?: number; // Optional: Initial number of cards to load (default 10)
   className?: string; // Optional: Additional CSS classes
   displayMode?: "list" | "gallery"; // Optional: Display mode (default: "list")
+  generationMode?: "blog" | "card"; // Optional: Filter by generation mode
 }
 
 /**
@@ -34,6 +35,7 @@ export const HyperCardFeed = ({
   initialLimit = 10,
   className = "",
   displayMode = "list",
+  generationMode,
 }: HyperCardFeedProps) => {
   // Data State
   const [cards, setCards] = useState<HyperBlogInfo[]>([]);
@@ -99,6 +101,10 @@ export const HyperCardFeed = ({
           if (selectedStatusFilter) {
             apiUrl += `&status=${selectedStatusFilter}`;
           }
+          // Add generation_mode filter if provided
+          if (generationMode) {
+            apiUrl += `&generation_mode=${generationMode}`;
+          }
         }
 
         // Fetch from API
@@ -155,7 +161,7 @@ export const HyperCardFeed = ({
         abortControllerRef.current = null;
       }
     },
-    [dataroomId, selectedBonfireFilter, selectedStatusFilter],
+    [dataroomId, selectedBonfireFilter, selectedStatusFilter, generationMode],
   );
 
   /**

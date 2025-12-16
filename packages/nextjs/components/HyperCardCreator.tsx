@@ -369,7 +369,7 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
 
         {/* Bonfire Preview */}
         {dataroomDescription && (
-          <div className="alert alert-info mb-4 christmas-info-box">
+          <div className="alert alert-info mb-4 p-4 christmas-info-box">
             <div>
               <div className="flex items-start gap-2">
                 <span className="text-xl">🔥</span>
@@ -407,7 +407,7 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
         ) : (
           <>
             {/* Form */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* User Query Input */}
               <div className="form-control">
                 <label className="label">
@@ -417,7 +417,7 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
                 </label>
                 <textarea
                   ref={textareaRef}
-                  className={`textarea textarea-bordered h-24 sm:h-32 w-full ${
+                  className={`textarea textarea-bordered h-24 sm:h-32 w-full resize-vertical focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                     !isQueryValid && userQuery.length > 0 ? "textarea-error" : ""
                   }`}
                   placeholder="e.g., 'A warm holiday greeting for family' or 'Christmas wishes for a special friend'"

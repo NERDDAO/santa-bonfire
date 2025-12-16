@@ -219,8 +219,8 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
   const displayDescription = isDescriptionExpanded ? descriptionText : truncateText(descriptionText, 150);
 
   return (
-    <div className={`card-minimal group ${className}`}>
-      <div className="card-body p-0">
+    <div className={`dataroom-card group ${className}`}>
+      <div className="dataroom-card-body">
         {/* Header Section - Description as Title */}
         <div className="flex flex-row items-start justify-between mb-3 gap-4">
           <div className="flex flex-row items-start gap-3 flex-1 min-w-0">
@@ -251,7 +251,7 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
 
         {/* Center Node Info Section */}
         {microsub.center_node_uuid && (
-          <div className="mb-4 bg-base-200/50 border border-base-content/10 rounded-lg p-3">
+          <div className="mb-4 dataroom-section-highlight p-3">
             <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-base-content/70 uppercase tracking-wide">
               <span>🎯</span>
               <span>Focus Node</span>
@@ -282,7 +282,7 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
         )}
 
         {/* Metadata Row */}
-        <div className="flex flex-col gap-3 text-sm mb-6 border-t border-base-content/5 pt-4">
+        <div className="flex flex-col gap-3 text-sm mb-6 border-t border-base-content/5 pt-4 dataroom-metadata">
           <div className="flex flex-row items-center gap-3 text-base-content/70">
             <span>📊</span>
             <span className="font-medium">
@@ -368,7 +368,7 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
         </div>
 
         {/* Card Actions */}
-        <div className="flex items-center justify-between mt-auto pt-2">
+        <div className="dataroom-card-actions justify-between">
           <button
             onClick={handleRefresh}
             className="btn btn-sm btn-ghost text-base-content/60 hover:bg-base-200"
@@ -378,7 +378,7 @@ export const DataRoomCard: React.FC<DataRoomCardProps> = ({ microsub, bonfires, 
             {loading || isFetching ? <span className="loading loading-spinner loading-xs"></span> : "🔄 Refresh"}
           </button>
           <button
-            className="btn btn-primary btn-sm px-6 shadow-sm hover:shadow-md transition-all duration-200"
+            className="btn btn-primary btn-sm"
             onClick={() => router.push(`/x402-chat?agent=${microsub.agent_id}`)}
           >
             Use Data Room

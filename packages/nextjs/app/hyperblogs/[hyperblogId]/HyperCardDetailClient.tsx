@@ -111,3 +111,7 @@ export default function HyperCardDetailClient() {
   return <HyperCardDetail blog={card} onBack={handleBack} showBackButton={true} initialSectionId={hash || null} />;
 }
 
+
+
+
+

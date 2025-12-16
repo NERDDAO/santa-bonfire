@@ -152,6 +152,7 @@ function SantaBonfireContent() {
           title="Santa's Christmas Cards"
           autoRefreshInterval={30000}
           initialLimit={12}
+          generationMode="card"
           className="w-full"
         />
       </div>

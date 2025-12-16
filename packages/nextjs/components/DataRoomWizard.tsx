@@ -24,19 +24,12 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
   const [selectedBonfire, setSelectedBonfire] = useState<BonfireInfo | null>(null);
   const [description, setDescription] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
-  const [priceUsd, setPriceUsd] = useState<number>(0.01);
-  const [queryLimit, setQueryLimit] = useState<number>(20);
-  const [expirationDays, setExpirationDays] = useState<number>(30);
   const [previewEntities, setPreviewEntities] = useState<PreviewEntity[]>([]);
   const [selectedCenterNode, setSelectedCenterNode] = useState<PreviewEntity | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Dynamic pricing state
-  const [dynamicPricingEnabled, setDynamicPricingEnabled] = useState<boolean>(false);
-  const [priceStepUsd, setPriceStepUsd] = useState<number>(0.0);
-  const [priceDecayRate, setPriceDecayRate] = useState<number>(0.0);
-  // Image generation model state
-  const [imageModel, setImageModel] = useState<"schnell" | "dev" | "pro" | "realism">("schnell");
+  // Image generation model state - preset to "dev"
+  const [imageModel, setImageModel] = useState<"schnell" | "dev" | "pro" | "realism">("dev");
 
   // Use agent selection hook to fetch bonfires
   const agentSelection = useAgentSelection();
@@ -48,18 +41,11 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
       setSelectedBonfire(null);
       setDescription("");
       setSystemPrompt("");
-      setPriceUsd(0.01);
-      setQueryLimit(20);
-      setExpirationDays(30);
       setPreviewEntities([]);
       setSelectedCenterNode(null);
       setError(null);
-      // Reset dynamic pricing state
-      setDynamicPricingEnabled(false);
-      setPriceStepUsd(0.0);
-      setPriceDecayRate(0.0);
-      // Reset image model state
-      setImageModel("schnell");
+      // Reset image model state to "dev"
+      setImageModel("dev");
     }
   }, [isOpen]);
 
@@ -123,14 +109,7 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
   }, [selectedBonfire, description]);
 
   // Validation helpers (must be declared before use in handlers)
-  const isStep2Valid =
-    description.trim().length >= 10 &&
-    description.length <= 500 &&
-    priceUsd > 0 &&
-    queryLimit >= 1 &&
-    queryLimit <= 1000 &&
-    expirationDays >= 1 &&
-    expirationDays <= 365;
+  const isStep2Valid = description.trim().length >= 10 && description.length <= 500;
   const isSystemPromptValid = systemPrompt.length <= 1000;
 
   // Navigation handlers
@@ -160,34 +139,16 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
       systemPrompt: systemPrompt.trim() || undefined,
       centerNodeUuid: selectedCenterNode.uuid,
       centerNodeName: selectedCenterNode.name,
-      priceUsd,
-      queryLimit,
-      expirationDays,
-      // Add dynamic pricing fields
-      dynamicPricingEnabled,
-      priceStepUsd,
-      priceDecayRate,
-      // Add image model
-      imageModel,
+      // Fixed preset values for marketplace datarooms
+      priceUsd: 5.0,
+      queryLimit: 20,
+      expirationDays: 30,
+      imageModel: "dev",
     };
 
     onComplete(config);
     onClose();
-  }, [
-    selectedBonfire,
-    selectedCenterNode,
-    description,
-    systemPrompt,
-    priceUsd,
-    queryLimit,
-    expirationDays,
-    dynamicPricingEnabled,
-    priceStepUsd,
-    priceDecayRate,
-    imageModel,
-    onComplete,
-    onClose,
-  ]);
+  }, [selectedBonfire, selectedCenterNode, description, systemPrompt, onComplete, onClose]);
 
   // Keyboard navigation handler with memoization
   const handleKeyDown = useCallback(
@@ -287,14 +248,14 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
 
         {/* Step 2: Description & System Prompt */}
         {currentStep === 2 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-semibold">Description *</span>
                 <span className="label-text-alt">{description.length}/500 (min 10 chars)</span>
               </label>
               <textarea
-                className={`textarea textarea-bordered h-24 ${
+                className={`textarea textarea-bordered h-24 resize-vertical ${
                   description.length > 0 && !isStep2Valid ? "textarea-error" : ""
                 }`}
                 placeholder="Describe the data room purpose and scope..."
@@ -315,7 +276,7 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
                 <span className="label-text-alt">{systemPrompt.length}/1000</span>
               </label>
               <textarea
-                className={`textarea textarea-bordered h-32 ${!isSystemPromptValid ? "textarea-error" : ""}`}
+                className={`textarea textarea-bordered h-32 resize-vertical ${!isSystemPromptValid ? "textarea-error" : ""}`}
                 placeholder="Enter a custom system prompt for chat interactions..."
                 value={systemPrompt}
                 onChange={e => setSystemPrompt(e.target.value)}
@@ -323,153 +284,6 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
               />
               <label className="label">
                 <span className="label-text-alt">Customize AI behavior for chat interactions</span>
-              </label>
-            </div>
-
-            <div className="divider">Subscription Settings</div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Price (USD) *</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered w-full"
-                placeholder="5.00"
-                value={priceUsd}
-                onChange={e => setPriceUsd(parseFloat(e.target.value) || 0)}
-                min={0.01}
-                max={1000}
-                step={0.01}
-              />
-              <label className="label">
-                <span className="label-text-alt">Price subscribers will pay for access</span>
-              </label>
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Query Limit *</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered w-full"
-                placeholder="20"
-                value={queryLimit}
-                onChange={e => setQueryLimit(parseInt(e.target.value) || 0)}
-                min={1}
-                max={1000}
-                step={1}
-              />
-              <label className="label">
-                <span className="label-text-alt">Maximum queries per subscription (1-1000)</span>
-              </label>
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Expiration (Days) *</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered w-full"
-                placeholder="30"
-                value={expirationDays}
-                onChange={e => setExpirationDays(parseInt(e.target.value) || 0)}
-                min={1}
-                max={365}
-                step={1}
-              />
-              <label className="label">
-                <span className="label-text-alt">Subscription duration in days (1-365)</span>
-              </label>
-            </div>
-
-            <div className="divider">Dynamic Pricing (Optional)</div>
-
-            <div className="form-control">
-              <label className="label cursor-pointer justify-start gap-3">
-                <input
-                  type="checkbox"
-                  className="toggle toggle-primary"
-                  checked={dynamicPricingEnabled}
-                  onChange={e => setDynamicPricingEnabled(e.target.checked)}
-                />
-                <span className="label-text">Enable dynamic pricing for hyperblogs</span>
-              </label>
-              <label className="label">
-                <span className="label-text-alt">Price increases with each purchase and decays over time</span>
-              </label>
-            </div>
-
-            {dynamicPricingEnabled && (
-              <>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Price Step (USD)</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0.50"
-                    value={priceStepUsd}
-                    onChange={e => setPriceStepUsd(parseFloat(e.target.value) || 0)}
-                    min={0}
-                    max={100}
-                    step={0.01}
-                  />
-                  <label className="label">
-                    <span className="label-text-alt">Price increase per hyperblog purchase</span>
-                  </label>
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Decay Rate (USD/hour)</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered w-full"
-                    placeholder="0.10"
-                    value={priceDecayRate}
-                    onChange={e => setPriceDecayRate(parseFloat(e.target.value) || 0)}
-                    min={0}
-                    max={10}
-                    step={0.01}
-                  />
-                  <label className="label">
-                    <span className="label-text-alt">Price decrease per hour (linear decay)</span>
-                  </label>
-                </div>
-
-                <div className="alert alert-info text-xs">
-                  <span>
-                    💡 First hyperblog has no protocol fee. Price formula: base + (step × purchases) - (decay × hours)
-                  </span>
-                </div>
-              </>
-            )}
-
-            <div className="divider">Image Generation</div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Banner Image Model</span>
-              </label>
-              <select
-                className="select select-bordered w-full"
-                value={imageModel}
-                onChange={e => setImageModel(e.target.value as "schnell" | "dev" | "pro" | "realism")}
-              >
-                <option value="schnell">Schnell - Fast & Good Quality ($0.006/image)</option>
-                <option value="dev">Dev - Balanced Speed/Quality ($0.052/image)</option>
-                <option value="pro">Pro - High Quality ($0.083/image)</option>
-                <option value="realism">Realism - Photorealistic ($0.083/image)</option>
-              </select>
-              <label className="label">
-                <span className="label-text-alt">
-                  Choose image quality for hyperblog banners. Higher quality = higher cost.
-                </span>
               </label>
             </div>
 
@@ -514,10 +328,10 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
                       }`}
                       onClick={() => setSelectedCenterNode(entity)}
                     >
-                      <div className="card-body p-4">
-                        <div className="flex items-start justify-between gap-2">
+                      <div className="card-body p-3">
+                        <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-3 mb-2">
                               <input
                                 type="radio"
                                 className="radio radio-primary radio-sm"

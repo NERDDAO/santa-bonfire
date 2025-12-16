@@ -261,13 +261,9 @@ export interface DataRoomConfig {
   systemPrompt?: string;
   centerNodeUuid: string;
   centerNodeName: string;
-  priceUsd: number;
-  queryLimit: number;
-  expirationDays: number;
-  // Dynamic pricing fields (optional)
-  dynamicPricingEnabled?: boolean;
-  priceStepUsd?: number;
-  priceDecayRate?: number;
+  priceUsd?: number;
+  queryLimit?: number;
+  expirationDays?: number;
   // Image generation model (optional)
   imageModel?: "schnell" | "dev" | "pro" | "realism";
 }
@@ -324,13 +320,9 @@ export interface CreateDataRoomRequest {
   description: string;
   system_prompt: string; // Required by backend (can be empty string)
   center_node_uuid?: string;
-  price_usd: number;
-  query_limit: number;
-  expiration_days: number;
-  // Dynamic pricing fields (optional)
-  dynamic_pricing_enabled?: boolean; // Optional, defaults to false
-  price_step_usd?: number; // Optional, defaults to 0.0
-  price_decay_rate?: number; // Optional, defaults to 0.0
+  price_usd?: number; // Optional with backend default
+  query_limit?: number; // Optional with backend default
+  expiration_days?: number; // Optional with backend default
   // Image generation model (optional)
   image_model?: "schnell" | "dev" | "pro" | "realism";
 }
@@ -424,6 +416,7 @@ export interface HyperBlogInfo {
   tx_hash: string | null;
   word_count: number | null;
   blog_length: "short" | "medium" | "long";
+  generation_mode?: "blog" | "card"; // Generation mode from metadata
   preview: string;
   summary?: string | null; // AI-generated 50-word summary (preferred over preview for feed display)
   image_prompt?: string | null; // AI-generated prompt for creating blog banner image

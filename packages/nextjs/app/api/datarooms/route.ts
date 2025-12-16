@@ -106,9 +106,6 @@ export async function POST(request: Request) {
     if (!body.description) {
       return NextResponse.json({ error: "description is required" }, { status: 400 });
     }
-    if (body.price_usd === undefined || body.price_usd === null) {
-      return NextResponse.json({ error: "price_usd is required" }, { status: 400 });
-    }
 
     // Validate field constraints
     if (body.description.length < 10 || body.description.length > 1000) {
@@ -120,7 +117,9 @@ export async function POST(request: Request) {
     if (body.system_prompt.length > 2000) {
       return NextResponse.json({ error: "system_prompt must be at most 2000 characters" }, { status: 400 });
     }
-    if (body.price_usd <= 0) {
+    // Make price_usd validation conditional and set default
+    const price_usd = body.price_usd ?? 0.25;
+    if (body.price_usd !== undefined && body.price_usd <= 0) {
       return NextResponse.json({ error: "price_usd must be greater than 0" }, { status: 400 });
     }
     if (body.query_limit !== undefined && (body.query_limit < 1 || body.query_limit > 1000)) {
@@ -136,12 +135,18 @@ export async function POST(request: Request) {
 
     const delveUrl = `${config.delve.apiUrl}/datarooms`;
 
+    // Ensure price_usd is included in request body
+    const requestBody = {
+      ...body,
+      price_usd,
+    };
+
     const delveResponse = await fetch(delveUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(requestBody),
       signal: AbortSignal.timeout(config.delve.timeout),
     });
 
