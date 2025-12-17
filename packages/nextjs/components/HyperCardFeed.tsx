@@ -91,6 +91,10 @@ export const HyperCardFeed = ({
         if (dataroomId) {
           // Bonfire-specific mode
           apiUrl = `/api/datarooms/${dataroomId}/hyperblogs?limit=${limit}&offset=${offset}`;
+          // Add generation_mode filter if provided
+          if (generationMode) {
+            apiUrl += `&generation_mode=${generationMode}`;
+          }
         } else {
           // Aggregated mode
           apiUrl = `/api/hyperblogs?limit=${limit}&offset=${offset}`;
@@ -195,7 +199,7 @@ export const HyperCardFeed = ({
 
     // Trigger immediate refetch with reset pagination
     fetchCards(0, initialLimit, false);
-  }, [selectedBonfireFilter, selectedStatusFilter, dataroomId, fetchCards, initialLimit]);
+  }, [selectedBonfireFilter, selectedStatusFilter, dataroomId, generationMode, fetchCards, initialLimit]);
 
   /**
    * Auto-refresh effect
