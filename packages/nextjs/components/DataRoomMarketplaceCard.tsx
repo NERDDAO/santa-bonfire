@@ -164,9 +164,9 @@ export function DataRoomMarketplaceCard({
     }
   };
 
-  // Fetch center node info only when preview is expanded (not on mount)
+  // Fetch center node info on mount/when center_node_uuid changes
   useEffect(() => {
-    if (isPreviewExpanded && dataroom.center_node_uuid && !centerNodeInfo && !centerNodeLoading) {
+    if (dataroom.center_node_uuid && !centerNodeInfo && !centerNodeLoading) {
       fetchCenterNodeInfo();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

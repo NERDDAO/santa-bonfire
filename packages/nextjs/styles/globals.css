@@ -317,6 +317,12 @@ body::before {
 .christmas-info-box {
   background: linear-gradient(135deg, rgba(34, 139, 34, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
   border-color: var(--color-christmas-green);
+  color: var(--color-base-content);
+}
+
+[data-theme="dark"] .christmas-info-box {
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(255, 215, 0, 0.1) 100%);
+  border-color: var(--color-christmas-green);
 }
 
 .btn {

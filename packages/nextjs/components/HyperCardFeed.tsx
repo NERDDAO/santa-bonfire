@@ -429,13 +429,15 @@ export const HyperCardFeed = ({
           {!dataroomId && <p className="text-sm opacity-70 mt-1">Latest from Santa&apos;s Workshop</p>}
           {dataroomId && <p className="text-sm opacity-70 mt-1">From this Bonfire</p>}
         </div>
-        {!isLoading && cards.length > 0 && (
+        {cards.length > 0 && autoRefreshInterval > 0 && (
           <div className="text-xs opacity-70 flex items-center gap-1">
-            {autoRefreshInterval > 0 && (
+            {isLoading || isLoadingMore ? (
               <>
                 <span className="loading loading-spinner loading-xs"></span>
-                Auto-refreshing
+                Refreshing...
               </>
+            ) : (
+              <span>Auto-refresh every {Math.round(autoRefreshInterval / 1000)}s</span>
             )}
           </div>
         )}

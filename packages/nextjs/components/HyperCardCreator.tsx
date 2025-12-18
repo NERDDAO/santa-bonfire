@@ -352,7 +352,7 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
   return (
     <div className="modal modal-open" onClick={handleClose} role="dialog" aria-label="Create Christmas Card Modal">
       <div
-        className="modal-box relative max-w-full sm:max-w-2xl christmas-modal"
+        className="modal-box relative max-w-[95vw] sm:max-w-2xl mx-auto px-4 sm:px-6 christmas-modal"
         onClick={e => e.stopPropagation()}
         style={{ maxHeight: "90vh", overflowY: "auto" }}
       >
@@ -369,19 +369,19 @@ export const HyperCardCreator: React.FC<HyperCardCreatorProps> = ({
 
         {/* Bonfire Preview */}
         {dataroomDescription && (
-          <div className="alert alert-info mb-4 p-4 christmas-info-box">
-            <div>
-              <div className="flex items-start gap-2">
-                <span className="text-xl">🔥</span>
-                <div className="flex-1">
-                  <div className="font-semibold mb-1">Santa&apos;s Bonfire:</div>
-                  <div className="text-sm opacity-90">
+          <div className="alert alert-info mb-4 p-4 sm:p-5 christmas-info-box text-base-content">
+            <div className="w-full">
+              <div className="flex items-start gap-3">
+                <span className="text-xl flex-shrink-0">🔥</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold mb-1 text-base-content">Santa&apos;s Bonfire:</div>
+                  <div className="text-sm text-base-content/80 break-words">
                     {dataroomDescription.length > 100
                       ? dataroomDescription.substring(0, 100) + "..."
                       : dataroomDescription}
                   </div>
                   {dataroomPrice !== undefined && (
-                    <div className="mt-2 text-sm font-bold">
+                    <div className="mt-2 text-sm font-bold text-base-content">
                       {isPriceLoading ? (
                         <span className="flex items-center gap-2">
                           <span className="loading loading-spinner loading-xs"></span>
