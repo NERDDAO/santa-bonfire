@@ -36,7 +36,7 @@ const Home: NextPage = () => {
   const handleCardSuccess = useCallback(
     (hypercardId: string) => {
       setIsCreatorOpen(false);
-      router.push(`/hypercards/${hypercardId}`);
+      router.push(`/hyperblogs/${hypercardId}`);
     },
     [router],
   );
