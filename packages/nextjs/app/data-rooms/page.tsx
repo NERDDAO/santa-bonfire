@@ -136,7 +136,7 @@ export default function DataRoomsPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
@@ -150,7 +150,7 @@ export default function DataRoomsPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
           {[1, 2, 3].map(i => (
             <div key={i} className="skeleton h-64 w-full"></div>
           ))}
@@ -164,7 +164,7 @@ export default function DataRoomsPage() {
   // Error state
   if (error && !loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
@@ -209,7 +209,7 @@ export default function DataRoomsPage() {
   // Empty state
   if (dataRooms.length === 0 && !loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-4xl font-bold mb-2">🎅 Santa&apos;s Workshop</h1>
@@ -250,7 +250,7 @@ export default function DataRoomsPage() {
 
   // Writer&apos;s Rooms grid
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
       <div className="mb-8">
         <div className="flex justify-between items-start">
           <div>
@@ -358,7 +358,7 @@ export default function DataRoomsPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
           {filteredDataRooms.map(dataroom => (
             <DataRoomMarketplaceCard key={dataroom.id} dataroom={dataroom} onHyperCardCreated={() => fetchDataRooms()} />
           ))}

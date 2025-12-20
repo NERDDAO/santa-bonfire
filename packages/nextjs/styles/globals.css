@@ -406,9 +406,15 @@ body::before {
   box-shadow: 0 4px 16px rgba(255, 107, 107, 0.1), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Card body with improved padding */
+/* Card body with improved responsive padding */
 .dataroom-card-body {
-  @apply p-5;
+  @apply p-4 sm:p-5 md:p-6;
+}
+
+/* Word-break utilities for card text elements */
+.dataroom-card-body h3,
+.dataroom-card-body p {
+  @apply break-words;
 }
 
 /* Badge styling improvements for light mode */
@@ -435,16 +441,30 @@ body::before {
   border-width: 1px;
 }
 
+/* Badge overflow prevention */
+.dataroom-card .badge {
+  @apply break-all max-w-full;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Ensure badge containers wrap properly */
+.dataroom-card .flex.flex-wrap {
+  @apply items-start;
+}
+
 /* Section backgrounds for better visual separation */
 [data-theme="light"] .dataroom-card .dataroom-section-highlight {
   background: rgba(196, 30, 58, 0.03);
   border: 1px solid rgba(196, 30, 58, 0.08);
   border-radius: 0.5rem;
+  @apply p-2 sm:p-3;
 }
 
 [data-theme="dark"] .dataroom-card .dataroom-section-highlight {
   background: rgba(255, 107, 107, 0.05);
   border: 1px solid rgba(255, 107, 107, 0.1);
+  @apply p-2 sm:p-3;
 }
 
 /* Button improvements */
@@ -609,6 +629,69 @@ body::before {
   --prose-pre-border: var(--color-base-content);
   --prose-quotes: var(--color-base-content);
   --prose-quote-border: var(--color-primary);
+}
+
+/* ========================================
+   Auto-Refresh Badge Styling
+   ======================================== */
+
+/* Custom badge for auto-refresh indicator with proper contrast */
+.badge-auto-refresh {
+  background-color: var(--color-base-200);
+  color: var(--color-base-content);
+  border: 1px solid oklch(var(--bc) / 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Dark theme variant with slightly lighter background */
+[data-theme="dark"] .badge-auto-refresh {
+  background-color: var(--color-base-300);
+  border-color: oklch(var(--bc) / 0.2);
+}
+
+/* Hover state for subtle interactivity feedback */
+.badge-auto-refresh:hover {
+  background-color: var(--color-base-300);
+  border-color: oklch(var(--bc) / 0.25);
+}
+
+[data-theme="dark"] .badge-auto-refresh:hover {
+  background-color: oklch(var(--b2) / 0.8);
+}
+
+/* ========================================
+   Status Badge & Reading Time Padding Enhancements
+   ======================================== */
+
+/* Enhanced padding for status badges (Ready, Creating, Failed) */
+.badge-status-enhanced {
+  padding: 0.5rem 0.75rem;
+  min-height: 2rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+/* Enhanced padding for reading time and view count badges */
+.badge-meta-enhanced {
+  padding: 0.4rem 0.65rem;
+  min-height: 1.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 640px) {
+  .badge-status-enhanced {
+    padding: 0.4rem 0.6rem;
+    min-height: 1.875rem;
+    font-size: 0.8125rem;
+  }
+  
+  .badge-meta-enhanced {
+    padding: 0.35rem 0.55rem;
+    min-height: 1.625rem;
+    font-size: 0.75rem;
+  }
 }
 
 /* Modal-specific scroll customizations */

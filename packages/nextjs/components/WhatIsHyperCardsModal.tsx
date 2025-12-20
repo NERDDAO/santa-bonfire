@@ -21,16 +21,16 @@ export const WhatIsHyperCardsModal = ({ isOpen, onClose }: WhatIsHyperCardsModal
   return (
     <div className="modal modal-open backdrop-blur-sm" onClick={onClose}>
       <div
-        className="modal-box bg-base-100 max-w-2xl relative p-8 sm:p-10 shadow-2xl christmas-modal"
+        className="modal-box bg-base-100 max-w-2xl relative p-6 sm:p-10 md:p-12 shadow-2xl christmas-modal"
         onClick={e => e.stopPropagation()}
       >
-        <button className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" onClick={onClose}>
+        <button className="btn btn-sm btn-circle btn-ghost absolute right-3 top-3 sm:right-4 sm:top-4" onClick={onClose}>
           ✕
         </button>
 
-        <h2 className="text-3xl font-bold mb-6 font-serif text-base-content">🎄 What Are Christmas Cards?</h2>
+        <h2 className="text-3xl font-bold mb-8 px-2 sm:px-0 font-serif text-base-content">🎄 What Are Christmas Cards?</h2>
 
-        <div className="space-y-5 text-base-content/80 leading-relaxed text-lg">
+        <div className="space-y-6 px-2 sm:px-4 text-base-content/80 leading-loose text-lg">
           <p>
             🎁 Christmas Cards are AI-generated personalized holiday greetings created from Santa&apos;s Bonfire knowledge graphs. 
             Using advanced Hierarchical Task Network (HTN) generation, we transform Santa&apos;s wisdom into unique, heartfelt 
@@ -48,7 +48,7 @@ export const WhatIsHyperCardsModal = ({ isOpen, onClose }: WhatIsHyperCardsModal
           </p>
         </div>
 
-        <div className="modal-action mt-8">
+        <div className="modal-action mt-10 px-2 sm:px-0">
           <button
             className="btn btn-primary px-8 shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={onClose}

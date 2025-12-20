@@ -73,11 +73,11 @@ export const Header = () => {
   });
 
   return (
-    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 shrink-0 justify-between z-20 shadow-sm border-b border-base-content/5 px-0 sm:px-4">
+    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 shrink-0 justify-between z-20 shadow-sm border-b border-base-content/5 px-2 sm:px-4">
       <div className="navbar-start w-auto lg:w-1/2">
         <details className="dropdown" ref={burgerMenuRef}>
-          <summary className="ml-1 btn btn-ghost lg:hidden hover:bg-transparent">
-            <Bars3Icon className="h-1/2" />
+          <summary className="btn btn-ghost lg:hidden hover:bg-transparent btn-sm">
+            <Bars3Icon className="h-6 w-6" />
           </summary>
           <ul
             className="menu menu-compact dropdown-content mt-3 p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-content/5"
@@ -101,7 +101,7 @@ export const Header = () => {
           <HeaderMenuLinks />
         </ul>
       </div>
-      <div className="navbar-end grow mr-4 gap-2">
+      <div className="navbar-end grow mr-2 sm:mr-4 gap-2 sm:gap-3">
         <button
           className="btn btn-ghost btn-sm btn-circle hover:bg-base-200 transition-colors"
           onClick={() => setIsInfoModalOpen(true)}

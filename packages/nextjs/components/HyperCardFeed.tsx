@@ -353,26 +353,26 @@ export const HyperCardFeed = ({
     switch (status) {
       case "generating":
         return (
-          <span className="badge badge-warning gap-1" aria-label="Status: Creating Magic">
+          <span className="badge badge-warning gap-1 badge-status-enhanced" aria-label="Status: Creating Magic">
             <span className="loading loading-spinner loading-xs" aria-hidden="true"></span>
             🎄 Creating
           </span>
         );
       case "completed":
         return (
-          <span className="badge badge-success gap-1" aria-label="Status: Ready">
+          <span className="badge badge-success gap-1 badge-status-enhanced" aria-label="Status: Ready">
             🎁 Ready
           </span>
         );
       case "failed":
         return (
-          <span className="badge badge-error gap-1" aria-label="Status: Failed">
+          <span className="badge badge-error gap-1 badge-status-enhanced" aria-label="Status: Failed">
             ❌ Failed
           </span>
         );
       default:
         return (
-          <span className="badge badge-ghost gap-1" aria-label={`Status: ${status}`}>
+          <span className="badge badge-ghost gap-1 badge-status-enhanced" aria-label={`Status: ${status}`}>
             {status}
           </span>
         );
@@ -430,11 +430,11 @@ export const HyperCardFeed = ({
           {dataroomId && <p className="text-sm opacity-70 mt-1">From this Bonfire</p>}
         </div>
         {cards.length > 0 && autoRefreshInterval > 0 && (
-          <div className="text-xs opacity-70 flex items-center gap-1">
+          <div className="badge badge-auto-refresh px-3 py-1.5 flex items-center gap-2 text-xs font-medium">
             {isLoading || isLoadingMore ? (
               <>
                 <span className="loading loading-spinner loading-xs"></span>
-                Refreshing...
+                <span>Refreshing...</span>
               </>
             ) : (
               <span>Auto-refresh every {Math.round(autoRefreshInterval / 1000)}s</span>
@@ -649,7 +649,7 @@ export const HyperCardFeed = ({
                           <span>•</span>
                           <span>{card.word_count} words</span>
                           <span>•</span>
-                          <span className="flex items-center gap-1">
+                          <span className="badge badge-ghost gap-1 badge-meta-enhanced flex items-center">
                             <Clock className="w-3 h-3" />
                             {calculateReadingTime(card.word_count)}
                           </span>
@@ -744,7 +744,7 @@ export const HyperCardFeed = ({
             className="modal-box max-w-full sm:max-w-5xl lg:max-w-6xl max-h-[90vh] p-8 sm:p-10 overflow-hidden flex flex-col bg-base-100 rounded-xl shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            <HyperCardDetail blog={selectedCard} onBack={handleCloseModal} showBackButton={true} />
+            <HyperCardDetail blog={selectedCard} onBack={handleCloseModal} />
           </div>
         </div>
       )}

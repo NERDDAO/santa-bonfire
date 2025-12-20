@@ -202,14 +202,14 @@ export function DataRoomMarketplaceCard({
       <div className="dataroom-card-body">
         {/* Header Section - Description as Title */}
         <div className="flex items-start justify-between mb-2 gap-3">
-          <div className="flex items-start gap-2 flex-1 min-w-0">
-            <span className="text-2xl mt-0.5">🔥</span>
+          <div className="flex items-start gap-2 flex-1 min-w-0 overflow-hidden">
+            <span className="text-2xl mt-0.5 flex-shrink-0">🔥</span>
             <div className="flex-1 min-w-0">
-              <h3 className="card-title text-lg leading-tight mb-2">
+              <h3 className="card-title text-lg leading-tight mb-2 break-words">
                 {truncateText(dataroom.description, 100) || "Untitled Writer's Room"}
               </h3>
               {/* Writer's Room Badge */}
-              <span className="badge badge-info badge-sm">
+              <span className="badge badge-info badge-sm break-all max-w-full">
                 {dataroom.bonfire_name || truncateAddress(dataroom.bonfire_id, 6)}
               </span>
             </div>
@@ -223,7 +223,7 @@ export function DataRoomMarketplaceCard({
 
         {/* Creator Badge */}
         <div className="mb-2">
-          <span className="badge badge-outline badge-sm">
+          <span className="badge badge-outline badge-sm break-all max-w-full">
             by{" "}
             {dataroom.creator_name ||
               dataroom.creator_username ||
@@ -248,8 +248,8 @@ export function DataRoomMarketplaceCard({
         )}
 
         {/* Pricing & Limits Section */}
-        <div className="dataroom-section-highlight p-3 mb-3">
-          <div className="flex flex-wrap gap-2 text-xs">
+        <div className="dataroom-section-highlight p-2 sm:p-3 mb-3">
+          <div className="flex flex-wrap gap-2 text-xs items-start">
             <div className="flex items-center gap-1">
               <span>💰</span>
               <span className="font-semibold">
@@ -277,7 +277,7 @@ export function DataRoomMarketplaceCard({
 
         {/* Center Node Info Section */}
         {dataroom.center_node_uuid && (
-          <div className="mb-3 dataroom-section-highlight p-3">
+          <div className="mb-3 dataroom-section-highlight p-2 sm:p-3">
             <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-base-content/70 uppercase tracking-wide">
               <span>🎯</span>
               <span>Focus Node</span>
@@ -289,11 +289,11 @@ export function DataRoomMarketplaceCard({
               </div>
             ) : centerNodeInfo ? (
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
                   {centerNodeInfo.entity_type && (
-                    <span className="badge badge-primary badge-outline badge-xs">{centerNodeInfo.entity_type}</span>
+                    <span className="badge badge-primary badge-outline badge-xs flex-shrink-0">{centerNodeInfo.entity_type}</span>
                   )}
-                  <span className="font-semibold text-sm text-base-content/90">{centerNodeInfo.name}</span>
+                  <span className="font-semibold text-sm text-base-content/90 break-words">{centerNodeInfo.name}</span>
                 </div>
                 {centerNodeInfo.summary && (
                   <p className="text-xs text-base-content/60 leading-relaxed line-clamp-2">
@@ -330,11 +330,11 @@ export function DataRoomMarketplaceCard({
                 <div className="space-y-1">
                   {(preview.entities as PreviewEntity[]).slice(0, 5).map(entity => (
                     <div key={entity.uuid || entity.id} className="text-xs bg-base-200 p-2 rounded">
-                      <div className="flex items-center gap-2">
-                        <span className="badge badge-xs badge-primary">{entity.entity_type || "Entity"}</span>
-                        <span className="font-semibold">{entity.name || "Unnamed"}</span>
+                      <div className="flex items-center gap-2 flex-wrap min-w-0">
+                        <span className="badge badge-xs badge-primary flex-shrink-0">{entity.entity_type || "Entity"}</span>
+                        <span className="font-semibold break-words">{entity.name || "Unnamed"}</span>
                       </div>
-                      {entity.summary && <p className="opacity-70 mt-1 line-clamp-2">{entity.summary}</p>}
+                      {entity.summary && <p className="opacity-70 mt-1 line-clamp-2 break-words">{entity.summary}</p>}
                     </div>
                   ))}
                 </div>

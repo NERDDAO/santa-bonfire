@@ -108,8 +108,10 @@ export default function HyperCardDetailClient() {
   // Main Content
   const hash = typeof window !== "undefined" ? window.location.hash.replace("#", "") : undefined;
 
-  return <HyperCardDetail blog={card} onBack={handleBack} showBackButton={true} initialSectionId={hash || null} />;
+  return <HyperCardDetail blog={card} onBack={handleBack} initialSectionId={hash || null} />;
 }
+
+
 
 
 

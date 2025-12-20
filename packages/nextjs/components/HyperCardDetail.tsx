@@ -12,7 +12,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   AlertCircle,
   AlertTriangle,
-  ArrowLeft,
   Calendar,
   Check,
   Clock,
@@ -20,12 +19,10 @@ import {
   Eye,
   FileText,
   Link as LinkIcon,
-  Menu,
   MessageCircle,
   ThumbsDown,
   ThumbsUp,
   User,
-  X,
 } from "lucide-react";
 import { useAccount } from "wagmi";
 
@@ -40,7 +37,6 @@ type CommentType = {
 interface HyperCardDetailProps {
   blog: HyperBlogInfo;
   onBack?: () => void;
-  showBackButton?: boolean;
   initialSectionId?: string | null;
 }
 
@@ -50,7 +46,7 @@ interface HyperCardDetailProps {
  * Reusable component that displays the full Christmas card content with all interactive features.
  * Used in both the feed modal and the dedicated detail page.
  */
-export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSectionId }: HyperCardDetailProps) => {
+export const HyperCardDetail = ({ blog, onBack, initialSectionId }: HyperCardDetailProps) => {
   const { address: userAddress, isConnected } = useAccount();
 
   // Full Content State
@@ -78,7 +74,6 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
   const [showPostcardView, setShowPostcardView] = useState<boolean>(false);
 
   // Navigation State
-  const [isTocOpen, setIsTocOpen] = useState<boolean>(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [copiedSectionId, setCopiedSectionId] = useState<string | null>(null);
@@ -124,26 +119,26 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
     switch (status) {
       case "generating":
         return (
-          <span className="badge badge-warning gap-1" aria-label="Status: Creating Magic">
+          <span className="badge badge-warning gap-1 badge-status-enhanced" aria-label="Status: Creating Magic">
             <span className="loading loading-spinner loading-xs" aria-hidden="true"></span>
             🎄 Creating Magic
           </span>
         );
       case "completed":
         return (
-          <span className="badge badge-success gap-1" aria-label="Status: Ready">
+          <span className="badge badge-success gap-1 badge-status-enhanced" aria-label="Status: Ready">
             🎁 Ready
           </span>
         );
       case "failed":
         return (
-          <span className="badge badge-error gap-1" aria-label="Status: Failed">
+          <span className="badge badge-error gap-1 badge-status-enhanced" aria-label="Status: Failed">
             ❌ Failed
           </span>
         );
       default:
         return (
-          <span className="badge badge-ghost gap-1" aria-label={`Status: ${status}`}>
+          <span className="badge badge-ghost gap-1 badge-status-enhanced" aria-label={`Status: ${status}`}>
             {status}
           </span>
         );
@@ -309,7 +304,6 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setIsTocOpen(false); // Close TOC on mobile after navigation
     }
   }, []);
 
@@ -554,55 +548,27 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
   return (
     <div className="bg-base-100 min-h-screen flex flex-col w-full">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-base-100/95 backdrop-blur border-b border-base-300 px-4 sm:px-6 py-3 sm:py-4 flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
-          {/* Mobile TOC Toggle */}
-          <button
-            className="btn btn-sm btn-ghost lg:hidden mt-1"
-            onClick={() => setIsTocOpen(!isTocOpen)}
-            aria-label="Toggle table of contents"
-          >
-            {isTocOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-
-          {/* Title and Status */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-xl sm:text-2xl mb-2 break-words">🎄 {currentCard.user_query}</h3>
-            <div className="flex flex-wrap items-center gap-2">
-              {getStatusBadge(currentCard.generation_status)}
-              {currentCard.generation_status === "completed" && currentCard.word_count && (
-                <span
-                  className="badge badge-ghost gap-1"
-                  aria-label={`Reading time: ${calculateReadingTime(currentCard.word_count)}`}
-                >
-                  <Clock className="w-3 h-3" />
-                  {calculateReadingTime(currentCard.word_count)}
-                </span>
-              )}
-              <span className="badge badge-ghost gap-1" aria-label={`Views: ${currentCard.view_count || 0}`}>
-                <Eye className="w-3 h-3" />
-                {currentCard.view_count || 0}
+      <div className="sticky top-0 z-30 bg-base-100/95 backdrop-blur border-b border-base-300 px-4 sm:px-6 py-3 sm:py-4">
+        {/* Title and Status */}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-xl sm:text-2xl mb-2 break-words">🎄 {currentCard.user_query}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            {getStatusBadge(currentCard.generation_status)}
+            {currentCard.generation_status === "completed" && currentCard.word_count && (
+              <span
+                className="badge badge-ghost gap-1 badge-meta-enhanced"
+                aria-label={`Reading time: ${calculateReadingTime(currentCard.word_count)}`}
+              >
+                <Clock className="w-3 h-3" />
+                {calculateReadingTime(currentCard.word_count)}
               </span>
-            </div>
+            )}
+            <span className="badge badge-ghost gap-1 badge-meta-enhanced" aria-label={`Views: ${currentCard.view_count || 0}`}>
+              <Eye className="w-3 h-3" />
+              {currentCard.view_count || 0}
+            </span>
           </div>
         </div>
-
-        {/* Back/Close Button */}
-        {showBackButton && (
-          <button className="btn btn-sm sm:btn-md btn-ghost gap-2" onClick={onBack} aria-label="Go back">
-            {onBack ? <X className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
-            <span className="hidden sm:inline">{onBack ? "Close" : "Back"}</span>
-          </button>
-        )}
-        {!showBackButton && onBack && (
-          <button
-            className="btn btn-sm sm:btn-md btn-circle btn-ghost flex-shrink-0"
-            onClick={onBack}
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
       </div>
 
       {/* View Toggle for Card Mode */}
@@ -760,40 +726,6 @@ export const HyperCardDetail = ({ blog, onBack, showBackButton = true, initialSe
                 </div>
               </div>
             </div>
-
-            {/* Mobile TOC Overlay */}
-            {isTocOpen && (
-              <div className="fixed inset-0 bg-base-100 z-50 p-6 overflow-y-auto lg:hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-semibold">🎁 Card Sections</h4>
-                  <button
-                    className="btn btn-sm btn-circle btn-ghost"
-                    onClick={() => setIsTocOpen(false)}
-                    aria-label="Close table of contents"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <nav className="space-y-2">
-                  {currentCard.blog_content.sections
-                    .sort((a, b) => a.order - b.order)
-                    .map((section, index) => (
-                      <button
-                        key={section.htn_node_id}
-                        onClick={() => handleScrollToSection(section.htn_node_id)}
-                        className={`toc-item w-full text-left text-sm py-3 px-4 rounded transition-all min-h-[44px] flex items-center gap-2 ${
-                          activeSection === section.htn_node_id
-                            ? "toc-item active bg-base-200 border-l-4 border-christmas-red font-semibold"
-                            : "border-l-4 border-transparent hover:bg-base-200"
-                        }`}
-                      >
-                        <span className="text-xs opacity-60 flex-shrink-0">{index + 1}.</span>
-                        <span className="flex-1">{section.title}</span>
-                      </button>
-                    ))}
-                </nav>
-              </div>
-            )}
           </>
         )}
 
