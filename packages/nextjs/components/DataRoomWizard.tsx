@@ -140,7 +140,7 @@ export function DataRoomWizard({ isOpen, onClose, onComplete }: DataRoomWizardPr
       centerNodeUuid: selectedCenterNode.uuid,
       centerNodeName: selectedCenterNode.name,
       // Fixed preset values for marketplace datarooms
-      priceUsd: 5.0,
+      priceUsd: 0.25,
       queryLimit: 20,
       expirationDays: 30,
       imageModel: "dev",
