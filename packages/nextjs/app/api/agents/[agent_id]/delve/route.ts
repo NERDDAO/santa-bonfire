@@ -6,7 +6,7 @@
  * This route acts as a simple proxy.
  *
  * Note: bonfire_id can be provided in the request body for graph scoping.
- * The backend will use bonfire_id to build group_ids for graph queries.
+ * The backend uses bonfire_id for graph query isolation.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/lib/config";

@@ -7,7 +7,7 @@ export interface BonfireInfo {
   id: string;
   name: string;
   taxonomy_labels?: string[];
-  groups?: { label: string; group_id: string }[];
+  groups?: { label: string; bonfire_id: string }[];
   latest_taxonomies?: {
     _id: string;
     name: string;

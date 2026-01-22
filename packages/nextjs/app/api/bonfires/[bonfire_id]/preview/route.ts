@@ -3,7 +3,7 @@
  * Proxies preview requests to delve's /delve endpoint for entity preview
  *
  * Uses bonfire_id directly for graph scoping. The backend uses bonfire_id
- * to build group_ids for graph queries, eliminating the need to fetch agents.
+ * for graph query isolation, eliminating the need to fetch agents.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/lib/config";

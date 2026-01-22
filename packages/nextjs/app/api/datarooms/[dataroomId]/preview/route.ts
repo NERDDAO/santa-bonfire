@@ -3,7 +3,7 @@
  * Proxies preview requests to delve backend using data room's description as query
  *
  * Uses bonfire_id directly for graph scoping. The backend uses bonfire_id
- * to build group_ids for graph queries.
+ * for graph query isolation.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/lib/config";
